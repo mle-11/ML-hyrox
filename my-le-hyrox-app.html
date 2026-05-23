@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MY LE HYROX">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%23fbbf24;stop-opacity:1'/><stop offset='100%' style='stop-color:%2306b6d4;stop-opacity:1'/></linearGradient></defs><rect width='192' height='192' fill='%23000'/><circle cx='96' cy='96' r='85' fill='url(%23grad)' opacity='0.15'/><circle cx='96' cy='96' r='85' fill='none' stroke='%23fbbf24' stroke-width='2'/><text x='96' y='75' font-size='56' font-weight='bold' fill='%23fbbf24' text-anchor='middle' font-family='monospace'>ML</text><text x='96' y='125' font-size='24' font-weight='bold' fill='%2306b6d4' text-anchor='middle' font-family='monospace'>HYROX</text><text x='96' y='155' font-size='10' fill='%239ca3af' text-anchor='middle' font-family='monospace'>177 lbs</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%23fbbf24;stop-opacity:1'/><stop offset='100%' style='stop-color:%2306b6d4;stop-opacity:1'/></linearGradient></defs><rect width='192' height='192' fill='%23000' rx='45'/><circle cx='96' cy='96' r='85' fill='url(%23grad)' opacity='0.15'/><circle cx='96' cy='96' r='85' fill='none' stroke='%23fbbf24' stroke-width='2'/><text x='96' y='75' font-size='56' font-weight='bold' fill='%23fbbf24' text-anchor='middle' font-family='monospace'>ML</text><text x='96' y='125' font-size='24' font-weight='bold' fill='%2306b6d4' text-anchor='middle' font-family='monospace'>HYROX</text><text x='96' y='155' font-size='10' fill='%239ca3af' text-anchor='middle' font-family='monospace'>177 lbs</text></svg>">
+    <title>MY LE Mixed Doubles HYROX Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+        }
+        
+        .header {
+            border-bottom: 1px solid #1f2937;
+            padding: 24px 16px;
+            position: sticky;
+            top: 0;
+            background: #000;
+            z-index: 10;
+        }
+        
+        .header-title h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #fbbf24;
+            margin-bottom: 8px;
+        }
+        
+        .header-title h2 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        
+        .header-meta {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+        }
+        
+        .header-meta p {
+            margin-bottom: 4px;
+        }
+        
+        .progress-bar {
+            display: flex;
+            gap: 4px;
+            height: 8px;
+        }
+        
+        .progress-bar div {
+            flex: 1;
+            background: #374151;
+            border-radius: 2px;
+        }
+        
+        .progress-bar div.active {
+            background: #06b6d4;
+        }
+        
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 16px;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            white-space: nowrap;
+            padding-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #4b5563;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #06b6d4;
+            border-bottom-color: #06b6d4;
+        }
+        
+        .week-selector {
+            margin-bottom: 24px;
+        }
+        
+        .week-selector h3 {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .week-btn {
+            padding: 8px 12px;
+            border: 2px solid #374151;
+            background: transparent;
+            color: #6b7280;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .week-btn.active {
+            border-color: #06b6d4;
+            background: #111827;
+            color: #06b6d4;
+        }
+        
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .day-btn {
+            padding: 12px;
+            border: 2px solid #374151;
+            background: transparent;
+            color: #6b7280;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+        }
+        
+        .day-btn:hover {
+            border-color: #4b5563;
+        }
+        
+        .day-btn.active {
+            border-color: #fbbf24;
+            background: #111827;
+        }
+        
+        .day-btn.done {
+            background: #065f46;
+            background-opacity: 0.3;
+        }
+        
+        .day-btn .checkmark {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            color: #10b981;
+            font-size: 14px;
+        }
+        
+        .day-label {
+            font-size: 10px;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .day-type {
+            font-size: 11px;
+        }
+        
+        .workout-panel {
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 2px solid #fbbf24;
+            background: #111827;
+            border-radius: 6px;
+        }
+        
+        .workout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .workout-title h4 {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        
+        .workout-meta {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+        
+        .workout-note {
+            font-size: 12px;
+            color: #fbbf24;
+        }
+        
+        .btn-complete {
+            padding: 8px;
+            background: #374151;
+            border: none;
+            border-radius: 4px;
+            color: #9ca3af;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .btn-complete.done {
+            background: #059669;
+            color: #fff;
+        }
+        
+        .exercises-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .exercise-card {
+            border: 1px solid #374151;
+            border-radius: 4px;
+            padding: 12px;
+            background: #1f2937;
+        }
+        
+        .exercise-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #06b6d4;
+        }
+        
+        .exercise-name.hyrox {
+            color: #a78bfa;
+        }
+        
+        .exercise-specs {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+        
+        .exercise-logs {
+            background: #111827;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            color: #d1d5db;
+        }
+        
+        .log-delete {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-log-set {
+            width: 100%;
+            padding: 8px;
+            background: rgba(6, 182, 212, 0.2);
+            border: none;
+            color: #06b6d4;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .log-form {
+            background: #000;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .log-form input {
+            padding: 6px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .log-form button {
+            padding: 6px;
+            background: #06b6d4;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .nutrition-targets {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .target-box {
+            padding: 12px;
+            background: rgba(6, 182, 212, 0.05);
+            border-radius: 4px;
+            border: 1px solid #06b6d4;
+        }
+        
+        .target-label {
+            font-weight: bold;
+            font-size: 12px;
+            color: #fbbf24;
+            margin-bottom: 8px;
+        }
+        
+        .target-value {
+            font-size: 12px;
+            color: #d1d5db;
+            margin-bottom: 2px;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            background: #06b6d4;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .form-group input {
+            padding: 8px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-box {
+            padding: 12px;
+            background: rgba(6, 182, 212, 0.05);
+            border-radius: 4px;
+            border: 1px solid #06b6d4;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        
+        .stat-value.current {
+            color: #06b6d4;
+        }
+        
+        .stat-value.progress {
+            color: #10b981;
+        }
+        
+        .weekly-tracker {
+            background: rgba(6, 182, 212, 0.05);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #06b6d4;
+        }
+        
+        .weekly-tracker h4 {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        
+        .weekly-header {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr 1fr;
+            gap: 8px;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .weekly-row {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr 1fr;
+            gap: 8px;
+            padding: 8px;
+            font-size: 12px;
+            border-radius: 3px;
+            margin-bottom: 4px;
+        }
+        
+        .weekly-row.actual {
+            background: rgba(6, 182, 212, 0.2);
+            border: 1px solid #06b6d4;
+        }
+        
+        .weekly-row.current {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid #fbbf24;
+        }
+        
+        .weekly-row.future {
+            background: #1f2937;
+        }
+        
+        .weight-history {
+            margin-top: 12px;
+        }
+        
+        .weight-history h5 {
+            font-size: 12px;
+            color: #9ca3af;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .weight-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #1f2937;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .logged-item {
+            padding: 12px;
+            background: #111827;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border: 1px solid #374151;
+        }
+        
+        .logged-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .logged-date {
+            font-weight: bold;
+            font-size: 12px;
+            color: #fbbf24;
+        }
+        
+        .logged-delete {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .logged-data {
+            font-size: 12px;
+            color: #d1d5db;
+        }
+        
+        .footer {
+            border-top: 1px solid #1f2937;
+            margin-top: 32px;
+            padding: 24px 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">
+                <h1>MY LE</h1>
+                <h2>MIXED DOUBLES HYROX TRAINING</h2>
+            </div>
+            <div class="header-meta">
+                <p>UTAH · SEPTEMBER 2026</p>
+                <p>17 Weeks · Mixed Doubles</p>
+                <p style="color: #fbbf24;">Goal: 155 lbs</p>
+            </div>
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('TRAINING')">TRAINING</button>
+                <button class="tab" onclick="switchTab('NUTRITION')">NUTRITION</button>
+                <button class="tab" onclick="switchTab('STATS')">STATS</button>
+            </div>
+
+            <!-- TRAINING TAB -->
+            <div id="TRAINING" class="tab-content">
+                <div class="week-selector">
+                    <h3>SELECT WEEK</h3>
+                    <div class="week-grid" id="weekGrid"></div>
+                    <div class="day-grid" id="dayGrid"></div>
+                </div>
+                <div id="workoutPanel"></div>
+            </div>
+
+            <!-- NUTRITION TAB -->
+            <div id="NUTRITION" class="tab-content hidden">
+                <div style="margin-bottom: 16px; padding: 16px; border: 2px solid #06b6d4; border-left: 4px solid #06b6d4; border-radius: 6px; background: rgba(6, 182, 212, 0.05);">
+                    <h3 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 16px;">Nutrition Targets</h3>
+                    <div class="nutrition-targets">
+                        <div class="target-box">
+                            <div class="target-label">Training Days (Mon, Tue, Wed, Thu, Sat, Sun)</div>
+                            <div class="target-value">🔥 Calories: 1350–1400</div>
+                            <div class="target-value">💪 Protein: 130g (NON-NEGOTIABLE)</div>
+                            <div class="target-value">🥔 Carbs: 120–140g</div>
+                            <div class="target-value">🧈 Fats: 40g</div>
+                            <div class="target-value" style="margin-top: 8px; color: #10b981; font-size: 11px;">📉 Push Phase: 4.67 lbs/week goal</div>
+                        </div>
+                        <div class="target-box">
+                            <div class="target-label">Easy Days (Fri)</div>
+                            <div class="target-value">🔥 Calories: 1250–1300</div>
+                            <div class="target-value">💪 Protein: 120g</div>
+                            <div class="target-value">🥔 Carbs: 80–100g</div>
+                            <div class="target-value">🧈 Fats: 40g</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="toggleNutritionForm()">+ Log Nutrition</button>
+                <div id="nutritionForm" class="hidden">
+                    <div class="form-group">
+                        <input type="date" id="nutrition-date" />
+                        <input type="number" id="nutrition-calories" placeholder="Calories" />
+                        <input type="number" id="nutrition-protein" placeholder="Protein (g)" />
+                        <input type="number" id="nutrition-carbs" placeholder="Carbs (g)" />
+                        <input type="number" id="nutrition-fats" placeholder="Fats (g)" />
+                        <input type="text" id="nutrition-notes" placeholder="Notes (optional)" />
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-primary" onclick="addNutrition()" style="margin-bottom: 0;">Save</button>
+                        <button class="btn-primary" onclick="toggleNutritionForm()" style="background: #4b5563; margin-bottom: 0;">Cancel</button>
+                    </div>
+                </div>
+                <div id="nutritionList"></div>
+            </div>
+
+            <!-- STATS TAB -->
+            <div id="STATS" class="tab-content hidden">
+                <div style="margin-bottom: 24px; padding: 16px; border: 2px solid #06b6d4; border-left: 4px solid #06b6d4; border-radius: 6px; background: rgba(6, 182, 212, 0.05);">
+                    <h3 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 16px;">Body Weight Progress</h3>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Starting Weight</div>
+                            <div class="stat-value">205 lbs</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Current Weight</div>
+                            <div class="stat-value current" id="currentWeight">202 lbs</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Lost / Goal</div>
+                            <div class="stat-value progress" id="weightProgress">3 / 50 lbs (6%)</div>
+                        </div>
+                    </div>
+
+                    <div class="weekly-tracker">
+                        <h4>Weight Loss by Week</h4>
+                        <div class="weekly-header">
+                            <span>Week</span>
+                            <span>Weight</span>
+                            <span>This Week</span>
+                            <span>Total Lost</span>
+                        </div>
+                        <div id="weeklyTracker"></div>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 12px;">Target: ~2.94 lbs/week to reach 155 lbs</p>
+                    </div>
+
+                    <button class="btn-primary" onclick="toggleWeightForm()">+ Log Weight</button>
+                    <div id="weightForm" class="hidden">
+                        <div class="form-group">
+                            <input type="date" id="weight-date" />
+                            <input type="number" id="weight-value" placeholder="Weight (lbs)" step="0.1" />
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-primary" onclick="addWeight()" style="margin-bottom: 0;">Save</button>
+                            <button class="btn-primary" onclick="toggleWeightForm()" style="background: #4b5563; margin-bottom: 0;">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <div class="weight-history">
+                        <h5>Weight History</h5>
+                        <div id="weightHistory"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Race Day: September 17, 2026 · Salt Lake City, UT</p>
+            <p style="margin-top: 8px;">📱 MY LE HYROX Training App</p>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            selectedWeek: 1,
+            expandedDay: null,
+            completedWorkouts: {},
+            exerciseLogs: {},
+            weightLog: [
+                { date: '2026-05-18', weight: 205 },
+                { date: new Date().toISOString().split('T')[0], weight: 202 }
+            ],
+            nutritionLog: {}
+        };
+
+        const workoutData = {
+            1: {
+                mon: { day: 'MON', type: 'STATIONS + LOWER', color: '#a78bfa', duration: '~85 min', details: 'Sled Push (4×12m @ 50kg) • Ski Erg (4×250m) • Lunges (3×12 each leg) • Goblet Squat / Glute Bridges (3×10 / 3×15) • DB RDL / Walking Lunges (3×10 / 2×10 each) • Leg Press / Leg Curl (3×12 / 3×12) • Calf stretch + Lacrosse ball arch', notes: 'Sled side entire session. No running.' },
+                tue: { day: 'TUE', type: 'RUN + UPPER', color: '#fbbf24', duration: '~75 min', details: 'Run (Treadmill intervals 75s jog / 2min walk × 6) • DB Bench Press (3×10) • Tricep Dips (3×10) • DB Rows (3×10) • Bicep Curls (3×12) • DB Shoulder Press (3×10) • Lateral Raises (3×12) • Plank (3×35s) • Dead Bug (3×10)', notes: 'Run on row side first. Upper body supersets.' },
+                wed: { day: 'WED', type: 'RUN + STATIONS', color: '#fbbf24', duration: '~80 min', details: 'Run (Treadmill intervals 60s jog / 2min walk × 6) • Farmer Carry (3×100m @ 24kg) • Wall Balls (3×12 @ 6kg) • Burpee Broad Jumps (3×8) • Step-ups (3×10) • Calf Raises (3×20) • Leg Press (3×12) • Leg Curl (3×12)', notes: 'Run on row side first. Cross to sled side once for stations.' },
+                thu: { day: 'THU', type: 'STATIONS + UPPER', color: '#a78bfa', duration: '~80 min', details: 'Row cardio (18 min @ 22-24 spm) • Sled Pull (4×12m @ 103kg) • Ski Erg (4×300m) • Farmer Carry (3×100m @ 24kg) • Lat Pulldown (3×10) • Face Pulls (3×15) • DB Shoulder Press (3×10) • Lateral Raises (3×12) • Push-ups (3×12) • Hammer Curls (3×12)', notes: 'Row cardio first. Cross to sled side once.' },
+                fri: { day: 'FRI', type: 'EASY RUN', color: '#10b981', duration: '~35 min', details: 'Run (Easy jog/walk 20-25 min @ 3.2-3.5 mph) • Walk + stretch + foot rehab (10 min)', notes: 'Recovery run. No strength, no HYROX.' },
+                sat: { day: 'SAT', type: 'RACE SIM', color: '#06b6d4', duration: '~90 min', details: 'Treadmill Run (400m) • Sled Push (12m @ 50kg) • Rowing Machine (400m) • Wall Balls (12 reps @ 6kg) • Burpee Broad Jumps (8 reps) • Farmer Carry (100m @ 24kg) • Rest (2:30 min between rounds × 4 rounds)', notes: 'Full race simulation. Both gym sides.' },
+                sun: { day: 'SUN', type: 'ZONE 2 RUN', color: '#10b981', duration: '~55 min', details: 'Run (Easy treadmill/outdoor 30-40 min @ 3.0-3.5 mph) • Stretch (10 min) • Foot rehab (10 min)', notes: 'Longest aerobic session. Do not push pace.' }
+            },
+            2: {
+                mon: { day: 'MON', type: 'STATIONS + LOWER', color: '#a78bfa', duration: '~85 min', details: 'Sled Push (4×14m @ 50kg) • Ski Erg (4×250m) • Lunges (3×12 each leg) • Goblet Squat / Glute Bridges (3×10 / 3×15) • DB RDL / Walking Lunges (3×10 / 2×10 each) • Leg Press / Leg Curl (3×12 / 3×12)', notes: 'Sled side entire session. Week 2 progression.' },
+                tue: { day: 'TUE', type: 'RUN + UPPER', color: '#fbbf24', duration: '~75 min', details: 'Run (Treadmill intervals 90s jog / 90s walk × 6) • DB Bench Press (3×10) • Tricep Dips (3×10) • DB Rows (3×10) • Bicep Curls (3×12) • DB Shoulder Press (3×10) • Lateral Raises (3×12) • Plank (3×35s) • Dead Bug (3×10)', notes: 'Run progression. 90s jog intervals.' },
+                wed: { day: 'WED', type: 'RUN + STATIONS', color: '#fbbf24', duration: '~80 min', details: 'Run (Treadmill intervals 75s jog / 2min walk × 6) • Farmer Carry (3×100-120m @ 24kg) • Wall Balls (3×12 @ 6kg) • Burpee Broad Jumps (3×8) • Step-ups (3×10) • Calf Raises (3×20) • Leg Press (3×12) • Leg Curl (3×12)', notes: 'Farmer carry distance increases. Week 2 progression.' },
+                thu: { day: 'THU', type: 'STATIONS + UPPER', color: '#a78bfa', duration: '~80 min', details: 'Row cardio (18 min @ 22-24 spm) • Sled Pull (4×14m @ 103kg) • Ski Erg (4×300m) • Farmer Carry (3×100-120m @ 24kg) • Lat Pulldown (3×10) • Face Pulls (3×15) • DB Shoulder Press (3×10) • Lateral Raises (3×12) • Push-ups (3×12) • Hammer Curls (3×12)', notes: 'Sled pull distance increases. Week 2 progression.' },
+                fri: { day: 'FRI', type: 'EASY RUN', color: '#10b981', duration: '~35 min', details: 'Run (Easy jog/walk 22 min @ 3.2-3.5 mph) • Walk + stretch + foot rehab (10 min)', notes: 'Recovery run. Slightly longer than Week 1.' },
+                sat: { day: 'SAT', type: 'RACE SIM', color: '#06b6d4', duration: '~90 min', details: 'Treadmill Run (400m) • Sled Push (12m @ 50kg) • Rowing Machine (400m) • Wall Balls (12 reps @ 6kg) • Burpee Broad Jumps (8 reps) • Farmer Carry (100m @ 24kg) • Rest (2:30 min between rounds × 4 rounds)', notes: 'Full race simulation. Both gym sides.' },
+                sun: { day: 'SUN', type: 'ZONE 2 RUN', color: '#10b981', duration: '~55 min', details: 'Run (Easy treadmill/outdoor 30-35 min @ 3.0-3.5 mph) • Stretch (10 min) • Foot rehab (10 min)', notes: 'Week 2 progression. Slightly longer.' }
+            },
+            3: {
+                mon: { day: 'MON', type: 'STATIONS + LOWER', color: '#a78bfa', duration: '~85 min', details: 'Sled Push (4×16m @ 50kg) • Ski Erg (4×250m) • Lunges (3×12 each leg) • Goblet Squat / Glute Bridges (3×10 / 3×15) • DB RDL / Walking Lunges (3×10 / 2×10 each) • Leg Press / Leg Curl (3×12 / 3×12)', notes: 'Sled push distance increases to 16m. Week 3 progression.' },
+                tue: { day: 'TUE', type: 'RUN + UPPER', color: '#fbbf24', duration: '~75 min', details: 'Run (Treadmill intervals 2min jog / 90s walk × 6) • DB Bench Press (3×10) • Tricep Dips (3×10) • DB Rows (3×10) • Bicep Curls (3×12) • DB Shoulder Press (3×10) • Lateral Raises (3×12) • Plank (3×35s) • Dead Bug (3×10)', notes: 'Run progression. 2min jog intervals.' },
+                wed: { day: 'WED', type: 'RUN + STATIONS', color: '#fbbf24', duration: '~80 min', details: 'Run (Treadmill intervals 90s jog / 90s walk × 6) • Farmer Carry (3×120-140m @ 24kg) • Wall Balls (3×15 @ 6kg) • Burpee Broad Jumps (3×8) • Step-ups (3×10) • Calf Raises (3×20) • Leg Press (3×12) • Leg Curl (3×12)', notes: 'Farmer carry and wall balls increase. Week 3 progression.' },
+                thu: { day: 'THU', type: 'STATIONS + UPPER', color: '#a78bfa', duration: '~80 min', details: 'Row cardio (18 min @ 22-24 spm) • Sled Pull (4×16m @ 103kg) • Ski Erg (4×300m) • Farmer Carry (3×120-140m @ 24kg) • Lat Pulldown (3×10) • Face Pulls (3×15) • DB Shoulder Press (3×10) • Lateral Raises (3×12) • Push-ups (3×12) • Hammer Curls (3×12)', notes: 'Sled pull distance increases to 16m. Week 3 progression.' },
+                fri: { day: 'FRI', type: 'EASY RUN', color: '#10b981', duration: '~35 min', details: 'Run (Easy jog/walk 25 min @ 3.2-3.5 mph) • Walk + stretch + foot rehab (10 min)', notes: 'Recovery run. Week 3 progression.' },
+                sat: { day: 'SAT', type: 'RACE SIM', color: '#06b6d4', duration: '~90 min', details: 'Treadmill Run (400m) • Sled Push (12m @ 50kg) • Rowing Machine (400m) • Wall Balls (12 reps @ 6kg) • Burpee Broad Jumps (8 reps) • Farmer Carry (100m @ 24kg) • Rest (2:30 min between rounds × 4 rounds)', notes: 'Full race simulation. Both gym sides.' },
+                sun: { day: 'SUN', type: 'ZONE 2 RUN', color: '#10b981', duration: '~55 min', details: 'Run (Easy treadmill/outdoor 35-40 min @ 3.0-3.5 mph) • Stretch (10 min) • Foot rehab (10 min)', notes: 'Longest aerobic session. Week 3 progression.' }
+            }
+        };
+
+        function init() {
+            document.getElementById('nutrition-date').valueAsDate = new Date();
+            document.getElementById('weight-date').valueAsDate = new Date();
+            renderProgressBar();
+            renderWeekSelector();
+            renderDayGrid();
+            updateWeeklyTracker();
+            updateWeightStats();
+            renderNutritionList();
+            renderWeightHistory();
+        }
+
+        function renderProgressBar() {
+            const bar = document.getElementById('progressBar');
+            bar.innerHTML = '';
+            for (let i = 1; i <= 17; i++) {
+                const div = document.createElement('div');
+                if (i <= state.selectedWeek) div.className = 'active';
+                bar.appendChild(div);
+            }
+        }
+
+        function renderWeekSelector() {
+            const grid = document.getElementById('weekGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 17; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'week-btn' + (i === state.selectedWeek ? ' active' : '');
+                btn.textContent = i;
+                btn.onclick = () => selectWeek(i);
+                grid.appendChild(btn);
+            }
+        }
+
+        function selectWeek(week) {
+            state.selectedWeek = week;
+            state.expandedDay = null;
+            renderProgressBar();
+            renderWeekSelector();
+            renderDayGrid();
+            renderWorkoutPanel();
+            updateWeeklyTracker();
+        }
+
+        function renderDayGrid() {
+            const grid = document.getElementById('dayGrid');
+            const currentWeek = workoutData[Math.min(state.selectedWeek, 3)] || workoutData[1];
+            grid.innerHTML = '';
+            
+            for (const [key, workout] of Object.entries(currentWeek)) {
+                const btn = document.createElement('button');
+                btn.className = 'day-btn' + (state.expandedDay === key ? ' active' : '');
+                const workoutKey = `W${state.selectedWeek}-${key}`;
+                if (state.completedWorkouts[workoutKey]) btn.className += ' done';
+                
+                btn.innerHTML = `
+                    <div class="day-label">${workout.day}</div>
+                    <div class="day-type">${workout.type.split('+')[0].trim()}</div>
+                    ${state.completedWorkouts[workoutKey] ? '<div class="checkmark">✓</div>' : ''}
+                `;
+                btn.onclick = () => expandDay(key);
+                grid.appendChild(btn);
+            }
+        }
+
+        function expandDay(day) {
+            state.expandedDay = state.expandedDay === day ? null : day;
+            renderDayGrid();
+            renderWorkoutPanel();
+        }
+
+        function renderWorkoutPanel() {
+            const panel = document.getElementById('workoutPanel');
+            if (!state.expandedDay) {
+                panel.innerHTML = '';
+                return;
+            }
+
+            const currentWeek = workoutData[Math.min(state.selectedWeek, 3)] || workoutData[1];
+            const workout = currentWeek[state.expandedDay];
+            const workoutKey = `W${state.selectedWeek}-${state.expandedDay}`;
+            const isComplete = state.completedWorkouts[workoutKey];
+
+            let html = `
+                <div class="workout-panel">
+                    <div class="workout-header">
+                        <div class="workout-title">
+                            <h4>Week ${state.selectedWeek} · ${workout.day}</h4>
+                            <div class="workout-meta">${workout.type} • ${workout.duration}</div>
+                            <div class="workout-note">📌 ${workout.notes}</div>
+                        </div>
+                        <button class="btn-complete ${isComplete ? 'done' : ''}" onclick="toggleWorkoutComplete('${state.expandedDay}')" title="Mark complete">✓</button>
+                    </div>
+                    <div class="exercises-list">
+            `;
+
+            const exercises = parseExercises(workout.details);
+            exercises.forEach((exercise, idx) => {
+                const isStrength = !exercise.isHyrox;
+                const logs = getExerciseLogs(exercise.name);
+                
+                html += `
+                    <div class="exercise-card">
+                        <div class="exercise-name ${exercise.isHyrox ? 'hyrox' : ''}">
+                            ${exercise.name}
+                        </div>
+                `;
+
+                if (exercise.specs) {
+                    html += `<div class="exercise-specs">${exercise.specs}</div>`;
+                }
+
+                if (isStrength) {
+                    if (logs.length > 0) {
+                        html += `<div class="exercise-logs">`;
+                        logs.forEach((log, logIdx) => {
+                            html += `
+                                <div class="log-item">
+                                    <span>Set ${logIdx + 1}: ${log.weight}kg × ${log.reps} reps</span>
+                                    <button class="log-delete" onclick="deleteExerciseLog('${exercise.name}', ${logIdx})">✕</button>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                    }
+
+                    html += `<button class="btn-log-set" onclick="showLogForm('${exercise.name}', ${idx})">+ Log Set</button>`;
+                    html += `<div id="log-form-${idx}" class="log-form hidden">
+                        <input type="number" id="weight-${idx}" placeholder="Weight (kg)" step="0.5" />
+                        <input type="number" id="reps-${idx}" placeholder="Reps" />
+                        <button onclick="saveExerciseLog('${exercise.name}', ${idx})">Add</button>
+                        <button onclick="hideLogForm(${idx})" style="background: #4b5563;">Done</button>
+                    </div>`;
+                } else {
+                    html += `<div style="font-size: 12px; color: #9ca3af; margin-top: 8px; font-style: italic;">HYROX Station</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            html += `</div></div>`;
+            panel.innerHTML = html;
+        }
+
+        function parseExercises(text) {
+            const lines = text.split('•').map(l => l.trim()).filter(l => l);
+            return lines.map(line => {
+                const match = line.match(/^([^(]+)\s*\(([^)]+)\)/);
+                if (match) {
+                    return {
+                        name: match[1].trim(),
+                        specs: match[2].trim(),
+                        isHyrox: ['Sled', 'Ski', 'Farmer', 'Wall Ball', 'Burpee', 'Treadmill', 'Rowing', 'Run'].some(t => match[1].includes(t))
+                    };
+                }
+                return { name: line, specs: '', isHyrox: false };
+            });
+        }
+
+        function getExerciseLogs(name) {
+            const key = `W${state.selectedWeek}-${state.expandedDay}-${name}`;
+            return state.exerciseLogs[key] || [];
+        }
+
+        function showLogForm(name, idx) {
+            document.getElementById(`log-form-${idx}`).classList.remove('hidden');
+        }
+
+        function hideLogForm(idx) {
+            document.getElementById(`log-form-${idx}`).classList.add('hidden');
+        }
+
+        function saveExerciseLog(name, idx) {
+            const weight = document.getElementById(`weight-${idx}`).value;
+            const reps = document.getElementById(`reps-${idx}`).value;
+            if (weight && reps) {
+                const key = `W${state.selectedWeek}-${state.expandedDay}-${name}`;
+                if (!state.exerciseLogs[key]) state.exerciseLogs[key] = [];
+                state.exerciseLogs[key].push({ weight: parseFloat(weight), reps: parseInt(reps) });
+                document.getElementById(`weight-${idx}`).value = '';
+                document.getElementById(`reps-${idx}`).value = '';
+                saveToStorage();
+                hideLogForm(idx);
+                renderWorkoutPanel();
+            }
+        }
+
+        function deleteExerciseLog(name, idx) {
+            const key = `W${state.selectedWeek}-${state.expandedDay}-${name}`;
+            state.exerciseLogs[key].splice(idx, 1);
+            saveToStorage();
+            renderWorkoutPanel();
+        }
+
+        function toggleWorkoutComplete(day) {
+            const key = `W${state.selectedWeek}-${day}`;
+            state.completedWorkouts[key] = !state.completedWorkouts[key];
+            saveToStorage();
+            renderDayGrid();
+            renderWorkoutPanel();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.remove('hidden');
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+        }
+
+        function toggleNutritionForm() {
+            document.getElementById('nutritionForm').classList.toggle('hidden');
+        }
+
+        function addNutrition() {
+            const date = document.getElementById('nutrition-date').value;
+            const calories = document.getElementById('nutrition-calories').value;
+            if (date && calories) {
+                state.nutritionLog[date] = {
+                    calories,
+                    protein: document.getElementById('nutrition-protein').value || '-',
+                    carbs: document.getElementById('nutrition-carbs').value || '-',
+                    fats: document.getElementById('nutrition-fats').value || '-',
+                    notes: document.getElementById('nutrition-notes').value || ''
+                };
+                document.getElementById('nutrition-calories').value = '';
+                document.getElementById('nutrition-protein').value = '';
+                document.getElementById('nutrition-carbs').value = '';
+                document.getElementById('nutrition-fats').value = '';
+                document.getElementById('nutrition-notes').value = '';
+                toggleNutritionForm();
+                renderNutritionList();
+            }
+        }
+
+        function deleteNutrition(date) {
+            delete state.nutritionLog[date];
+            renderNutritionList();
+        }
+
+        function renderNutritionList() {
+            const list = document.getElementById('nutritionList');
+            const entries = Object.entries(state.nutritionLog).sort(([a], [b]) => b.localeCompare(a));
+            if (entries.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+            list.innerHTML = '<h4 style="font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 12px;">Logged Days</h4>';
+            entries.forEach(([date, data]) => {
+                const item = document.createElement('div');
+                item.className = 'logged-item';
+                item.innerHTML = `
+                    <div class="logged-header">
+                        <span class="logged-date">${new Date(date).toLocaleDateString()}</span>
+                        <button class="logged-delete" onclick="deleteNutrition('${date}')">✕</button>
+                    </div>
+                    <div class="logged-data">🔥 ${data.calories} cal • 💪 ${data.protein}g protein • 🥔 ${data.carbs}g carbs • 🧈 ${data.fats}g fat</div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function toggleWeightForm() {
+            document.getElementById('weightForm').classList.toggle('hidden');
+        }
+
+        function addWeight() {
+            const date = document.getElementById('weight-date').value;
+            const weight = document.getElementById('weight-value').value;
+            if (date && weight) {
+                state.weightLog.push({ date, weight: parseFloat(weight) });
+                state.weightLog.sort((a, b) => new Date(a.date) - new Date(b.date));
+                document.getElementById('weight-value').value = '';
+                saveToStorage();
+                toggleWeightForm();
+                updateWeightStats();
+                updateWeeklyTracker();
+                renderWeightHistory();
+            }
+        }
+
+        function updateWeightStats() {
+            const current = state.weightLog[state.weightLog.length - 1].weight;
+            const lost = 205 - current;
+            const percent = Math.round((lost / 50) * 100);
+            document.getElementById('currentWeight').textContent = current + ' lbs';
+            document.getElementById('weightProgress').textContent = lost.toFixed(1) + ' / 50 lbs (' + percent + '%)';
+        }
+
+        function updateWeeklyTracker() {
+            const tracker = document.getElementById('weeklyTracker');
+            tracker.innerHTML = '';
+            const startDate = new Date('2026-05-18');
+            const startOfWeek = new Date(startDate);
+            startOfWeek.setDate(startOfWeek.getDate() - 1);
+            
+            let previousWeight = 205;
+            
+            for (let week = 1; week <= 17; week++) {
+                const fridayDate = new Date(startOfWeek);
+                fridayDate.setDate(fridayDate.getDate() + (week * 7));
+                const fridayDateStr = fridayDate.toISOString().split('T')[0];
+                
+                const actualWeight = state.weightLog.find(entry => entry.date === fridayDateStr);
+                const targetLoss = (205 - 155) / 17;
+                const projectedWeight = 205 - (targetLoss * week);
+                const weight = actualWeight ? actualWeight.weight : projectedWeight;
+                const weeklyLoss = previousWeight - weight;
+                const totalLoss = 205 - weight;
+                const isOnTrack = actualWeight && weight <= projectedWeight + 1;
+                const isBehind = actualWeight && weight > projectedWeight + 1;
+                
+                const row = document.createElement('div');
+                row.className = 'weekly-row ' + (actualWeight ? 'actual' : week === state.selectedWeek ? 'current' : 'future');
+                
+                let statusIcon = '(proj)';
+                let statusColor = '#9ca3af';
+                if (actualWeight) {
+                    statusIcon = isOnTrack ? '✓' : '⚠';
+                    statusColor = isOnTrack ? '#10b981' : '#f59e0b';
+                }
+                
+                row.innerHTML = `
+                    <span style="font-weight: bold; color: #fff;">W${week}</span>
+                    <span style="color: ${actualWeight ? '#06b6d4' : '#9ca3af'};">${weight.toFixed(1)} <span style="color: ${statusColor}; font-size: 10px;">${statusIcon}</span></span>
+                    <span style="color: ${weeklyLoss > 0 ? '#10b981' : weeklyLoss < 0 ? '#ef4444' : '#9ca3af'};">-${Math.abs(weeklyLoss).toFixed(1)}</span>
+                    <span style="color: #fbbf24; font-weight: bold;">-${totalLoss.toFixed(1)}</span>
+                `;
+                
+                tracker.appendChild(row);
+                previousWeight = weight;
+            }
+        }
+
+        function renderWeightHistory() {
+            const hist = document.getElementById('weightHistory');
+            hist.innerHTML = '';
+            const sorted = [...state.weightLog].reverse();
+            sorted.forEach((entry, idx) => {
+                const item = document.createElement('div');
+                item.className = 'weight-item';
+                const date = new Date(entry.date).toLocaleDateString();
+                const change = idx > 0 ? (sorted[idx - 1].weight - entry.weight).toFixed(1) : '-';
+                item.innerHTML = `
+                    <span>${date}</span>
+                    <strong style="color: #fbbf24;">${entry.weight} lbs</strong>
+                    ${idx > 0 ? `<span style="color: #10b981;">-${change} lbs</span>` : ''}
+                `;
+                hist.appendChild(item);
+            });
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('hyroxData', JSON.stringify(state));
+            } catch (e) {
+                console.log('Storage save error:', e);
+            }
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('hyroxData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                state = { ...state, ...data };
+            }
+        }
+
+        window.addEventListener('beforeunload', () => {
+            saveToStorage();
+        });
+
+        // Auto-save on any changes
+        setInterval(() => {
+            saveToStorage();
+        }, 5000);
+
+        loadFromStorage();
+        init();
+    </script>
+</body>
+</html>
