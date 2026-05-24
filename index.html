@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>MY LE HYROX</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box}
+input[type="text"], input[type="number"] {font-size:16px !important}
+html, body {background:#000;color:#fff;height:100%;width:100%}
+body {font-family:'Courier New',monospace;padding-bottom:100px;background:#000}
+
+.header {background:#000;padding:20px 0;padding-bottom:0}
+.header-top {display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0;padding:0 16px;padding-bottom:8px}
+.header-left h1 {font-size:32px;color:#fff;font-weight:900;margin:0;line-height:1.1}
+.plan-title {font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:block}
+.header-right {display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.date-badge {padding:6px 14px;background:#000;border:1px solid #374151;border-radius:20px;font-size:10px;color:#9ca3af}
+.week-select {background:#000;border:1px solid #374151;color:#d4af37;padding:6px 12px;border-radius:4px;font-family:'Courier New';font-size:10px;cursor:pointer;font-weight:bold}
+
+.workout-title {font-size:28px;font-weight:900;line-height:1.2;letter-spacing:-1px;color:#d4af37;padding:0 16px;margin:4px 0 0 0;word-wrap:break-word;word-break:break-word}
+.line-thin {height:0.5px;background:#374151;margin:12px 0}
+.workout-desc {font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;margin:12px 16px 16px 16px}
+
+.day-buttons {display:flex;justify-content:space-between;gap:4px;flex-wrap:nowrap;padding:12px 0;margin:0 16px}
+.day-btn {flex:1;padding:6px 4px;border:2px solid #374151;background:transparent;color:#9ca3af;cursor:pointer;font-size:9px;border-radius:20px;font-family:'Courier New';font-weight:bold;white-space:nowrap;text-align:center;transition:all 0.2s}
+.day-btn.active {border-color:#d4af37;color:#d4af37;background:rgba(212,175,55,0.1)}
+.day-btn.active::after {content:' ●';font-size:8px}
+.day-btn.completed {background:#d4af37;border-color:#d4af37;color:#000;font-weight:bold}
+
+.sets-header {display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:2px solid #374151;font-size:10px;letter-spacing:1px;margin:0;background:#000}
+.sets-label {color:#9ca3af;text-transform:uppercase}
+.sets-count {color:#d4af37;font-weight:bold;font-size:12px}
+
+.content {padding:16px;padding-bottom:0;background:#000;min-height:100vh}
+
+.cardio-card {background:#000;border:1px solid #374151;border-radius:8px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;justify-content:space-between;transition:all 0.3s}
+.cardio-card.cardio-done {background:rgba(212,175,55,0.08);border-color:#d4af37}
+.cardio-icon {font-size:32px;min-width:40px;text-align:center}
+.cardio-content {flex:1}
+.cardio-name {font-size:14px;font-weight:bold;color:#fff;margin-bottom:4px}
+.cardio-desc {font-size:9px;color:#9ca3af;line-height:1.4}
+.cardio-last {font-size:8px;color:#9ca3af;margin-top:6px;border-top:1px solid #374151;padding-top:4px;font-style:italic}
+.cardio-btn {padding:6px 12px;background:#d4af37;border:none;color:#000;border-radius:4px;cursor:pointer;font-size:9px;font-family:'Courier New';font-weight:bold;white-space:nowrap}
+.cardio-btn:hover {opacity:0.9}
+.cardio-btn-delete {padding:6px 12px;background:transparent;border:1px solid #d32f2f;color:#d32f2f;border-radius:4px;cursor:pointer;font-size:9px;font-family:'Courier New';font-weight:bold;white-space:nowrap}
+.cardio-btn-delete:hover {background:#d32f2f;color:#fff}
+
+.cardio-expand {display:none;background:transparent;border-top:1px solid #374151;padding:14px 0;margin-top:14px}
+.cardio-expand.show {display:block}
+.cardio-input-label {font-size:9px;color:#9ca3af;text-transform:uppercase;margin-bottom:6px;display:block;letter-spacing:1px;font-weight:bold}
+.cardio-input {width:100%;padding:10px;background:transparent;border:1px solid #374151;color:#fff;border-radius:4px;font-family:'Courier New';font-size:12px;margin-bottom:4px}
+.cardio-input-hint {font-size:8px;color:#9ca3af;margin-top:4px;margin-bottom:12px;font-style:italic}
+.cardio-buttons {display:flex;gap:8px;margin-top:12px}
+.cardio-save-btn {flex:1;padding:10px;border:1px solid #374151;background:#d4af37;border-color:#d4af37;color:#000;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Courier New';font-weight:bold;text-transform:uppercase}
+.cardio-cancel-btn {flex:1;padding:10px;border:1px solid #374151;background:transparent;color:#fff;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Courier New';font-weight:bold;text-transform:uppercase}
+
+.long-run-block {background:#000;border:1px solid #374151;border-radius:8px;padding:20px;margin-bottom:16px;text-align:center;transition:all 0.3s}
+.long-run-block.logged {background:rgba(212,175,55,0.08);border-color:#d4af37}
+.long-run-icon {font-size:48px;margin-bottom:16px}
+.long-run-title {font-size:14px;font-weight:900;color:#06b6d4;margin-bottom:12px}
+.long-run-desc {font-size:10px;color:#9ca3af;margin-bottom:20px;line-height:1.6}
+.long-run-inputs {display:flex;flex-direction:column;gap:10px;margin-bottom:16px;transition:all 0.3s}
+.long-run-input {display:flex;align-items:center;gap:8px}
+.long-run-input label {font-size:9px;color:#9ca3af;text-transform:uppercase;width:60px;font-weight:bold}
+.long-run-input input {flex:1;padding:8px;background:transparent;border:1px solid #374151;color:#fff;border-radius:4px;font-family:'Courier New';font-size:11px}
+.long-run-btn {width:100%;padding:10px;background:#d4af37;border:none;color:#000;border-radius:4px;cursor:pointer;font-weight:bold;font-family:'Courier New';font-size:10px;margin-bottom:8px;transition:all 0.3s}
+.long-run-btn:hover {opacity:0.9}
+.long-run-btn.delete {background:#374151;color:#9ca3af}
+.long-run-summary {color:#d4af37;font-weight:bold;margin-bottom:16px}
+.long-run-tips {display:flex;flex-direction:column;gap:12px}
+.long-run-tip {background:#000;border:1px solid #374151;border-radius:6px;padding:14px;text-align:left;font-size:9px;color:#9ca3af;line-height:1.5}
+.long-run-tip-title {color:#06b6d4;font-weight:bold;margin-bottom:4px}
+
+.exercise-card {background:#000;border:1px solid #374151;border-radius:8px;padding:14px;margin-bottom:12px;transition:all 0.3s}
+.exercise-card.all-done {background:rgba(212,175,55,0.08);border-color:#d4af37}
+.ex-header {display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.ex-left {flex:1}
+.ex-name {font-size:14px;font-weight:bold;color:#fff;margin-bottom:6px}
+.ex-notes {font-size:9px;color:#9ca3af;font-style:italic;line-height:1.4}
+.ex-last {font-size:8px;color:#d4af37;margin-top:4px;font-weight:bold}
+.ex-reps {font-size:14px;font-weight:bold;color:#d4af37}
+
+.set-circles {display:flex;gap:6px;margin-bottom:12px;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;align-items:center;width:100%}
+.circle-btn {width:44px;height:44px;border-radius:50%;border:2px solid #374151;background:transparent;color:#9ca3af;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Courier New';transition:all 0.2s;position:relative}
+.circle-btn:hover {border-color:#d4af37;color:#d4af37}
+.circle-btn.done {background:#d4af37;border-color:#d4af37;color:#000}
+.circle-btn .delete {display:none;position:absolute;font-size:12px;cursor:pointer;top:-6px;right:-6px;background:#d32f2f;border-radius:50%;width:20px;height:20px;align-items:center;justify-content:center;color:#fff;line-height:1}
+.circle-btn.done:hover .delete {display:flex}
+
+.rest-bar {background:transparent;border:1px solid #374151;border-radius:6px;padding:10px;text-align:center;font-size:9px;color:#9ca3af;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:1px}
+.rest-dot {width:8px;height:8px;background:#fff;border-radius:50%}
+
+.set-expand {display:none;background:transparent;border-top:1px solid #374151;padding:14px 0;margin-top:14px;width:100%}
+.set-expand.show {display:block;width:100%}
+.set-label {font-size:9px;color:#9ca3af;text-transform:uppercase;margin-bottom:6px;display:block;letter-spacing:1px;font-weight:bold;width:100%}
+.set-input {background:#000;border:1px solid #374151;color:#d4af37;padding:10px;border-radius:4px;font-size:16px !important;margin-bottom:8px;width:100%;box-sizing:border-box}
+.set-hint {font-size:8px;color:#9ca3af;margin-bottom:12px;display:block;width:100%;font-style:italic}
+.set-buttons {width:100%;display:flex;gap:8px;margin-top:12px;flex-direction:row;justify-content:space-between}
+.set-btn {padding:10px;border:1px solid #374151;background:transparent;color:#fff;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Courier New';font-weight:bold;text-transform:uppercase;flex:1;min-height:40px}
+.set-btn-save {background:#d4af37;border-color:#d4af37;color:#000}
+
+.recovery-block {background:rgba(16,185,129,0.08);border-left:4px solid #10b981;padding:18px;border-radius:6px;margin:20px 0;text-align:center}
+.recovery-icon {font-size:40px;margin-bottom:10px}
+.recovery-title {font-size:15px;font-weight:bold;color:#10b981;margin-bottom:10px}
+.recovery-text {font-size:10px;color:#9ca3af;line-height:1.6}
+
+.tabs {position:fixed;bottom:0;left:0;right:0;background:#000;border-top:2px solid #374151;display:flex;z-index:100}
+.tab-btn {flex:1;padding:12px;color:#9ca3af;cursor:pointer;font-size:10px;text-transform:uppercase;background:transparent;border:none;font-family:'Courier New';font-weight:bold;letter-spacing:1px}
+.tab-btn.active {color:#d4af37}
+
+.tab-pane {display:none;padding:0;background:#000}
+.tab-pane.show {display:block}
+
+.stat-box {background:#000;border:1px solid #374151;padding:14px;border-radius:6px;margin-bottom:14px}
+.stat-label {font-size:9px;color:#9ca3af;text-transform:uppercase;margin-bottom:6px;letter-spacing:1px;font-weight:bold}
+.stat-value {font-size:18px;color:#d4af37;font-weight:bold}
+.stat-detail {font-size:9px;color:#9ca3af;margin-top:4px}
+
+.weight-entry {background:#000;border:1px solid #374151;padding:12px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px}
+.weight-date {color:#9ca3af;margin-bottom:6px}
+.weight-val {color:#d4af37;font-weight:bold;margin-bottom:6px}
+.weight-actions {display:flex;gap:6px}
+.weight-btn {padding:4px 8px;font-size:8px;border:1px solid #374151;background:transparent;color:#9ca3af;border-radius:4px;cursor:pointer;font-family:'Courier New'}
+.weight-btn:hover {border-color:#d4af37;color:#d4af37}
+
+.spacer {height:80px}
+.nutrition-pane {padding:16px;background:#000}
+.stats-pane {padding:16px;padding-bottom:100px;background:#000}
+
+.weight-edit-expand {display:none;background:transparent;border-top:1px solid #374151;padding:14px 0;margin-top:8px}
+.weight-edit-expand.show {display:block}
+.weight-edit-inputs {display:flex;gap:8px;margin-bottom:8px}
+.weight-edit-input {flex:1;padding:8px;background:transparent;border:1px solid #374151;color:#fff;border-radius:4px;font-family:'Courier New';font-size:11px}
+.weight-edit-buttons {display:flex;gap:6px}
+.weight-edit-btn {flex:1;padding:8px;border:1px solid #374151;background:transparent;color:#fff;border-radius:4px;cursor:pointer;font-size:9px;font-family:'Courier New';font-weight:bold;text-transform:uppercase}
+.weight-edit-btn.save {background:#d4af37;border-color:#d4af37;color:#000}
+
+.toast {position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);background:#d4af37;color:#000;padding:16px 24px;border-radius:8px;font-weight:bold;font-family:'Courier New';z-index:1000;text-align:center;font-size:14px;animation:slideDown 0.3s ease}
+@keyframes slideDown {from {opacity:0;transform:translate(-50%, -100%)} to {opacity:1;transform:translate(-50%, -50%)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div class="header-top">
+<div>
+<span class="plan-title">MY LE · HYROX MIXED DOUBLES</span>
+<h1>TODAY</h1>
+</div>
+<div class="header-right">
+<div class="date-badge" id="workDate">MON, MAY 18</div>
+<select class="week-select" id="weekSelect">
+<option value="1">W1</option>
+<option value="2">W2</option>
+<option value="3">W3</option>
+<option value="4">W4 (DELOAD)</option>
+<option value="5">W5</option>
+<option value="6">W6</option>
+<option value="7">W7</option>
+<option value="8">W8</option>
+</select>
+</div>
+</div>
+
+<div class="workout-title" id="workoutTitle">STATIONS + LOWER</div>
+<div class="line-thin"></div>
+<div class="workout-desc" id="workoutDesc">~85 min • Sled side</div>
+
+<div class="day-buttons" id="dayButtons"></div>
+
+<div class="sets-header">
+<span class="sets-label">Sets Completed</span>
+<span class="sets-count" id="setsCount">0 / 0</span>
+</div>
+</div>
+
+<div class="content">
+<div class="tab-pane show" id="workoutPane"></div>
+<div class="tab-pane nutrition-pane" id="nutritionPane">
+<h2 style="font-size:14px;color:#d4af37;margin:20px 0 16px 0">NUTRITION (1,200 CAL/DAY TOTAL)</h2>
+
+<div class="stat-box" style="background:rgba(212,175,55,0.08);border-color:#d4af37">
+<div class="stat-label">HIGH VOLUME DAYS (MON/WED/THU/SAT)</div>
+<div style="margin-top:8px;font-size:10px;line-height:2.2">
+<div>~1,200 cal</div>
+<div style="color:#06b6d4;font-weight:bold">110g protein = 440 cal (36.7%)</div>
+<div style="color:#10b981">130g carbs = 520 cal (43.3%) — MORE energy for circuits</div>
+<div>26g fat = 234 cal (19.5%)</div>
+<div style="margin-top:4px;color:#9ca3af;font-size:9px">TOTAL: 36.7% + 43.3% + 19.5% = 100% ✓</div>
+<div style="margin-top:8px;font-size:9px;color:#9ca3af">Run FIRST → strength after (protects feet/arches)</div>
+</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-label">LOWER VOLUME DAYS (TUE/FRI/SUN)</div>
+<div style="margin-top:8px;font-size:10px;line-height:2.2">
+<div>~1,200 cal</div>
+<div style="color:#06b6d4;font-weight:bold">110g protein = 440 cal (36.7%) — same high protein</div>
+<div style="color:#10b981">100g carbs = 400 cal (33.3%) — LESS carbs, lighter training</div>
+<div>43g fat = 387 cal (32.3%) — higher for satiety</div>
+<div style="margin-top:4px;color:#9ca3af;font-size:9px">TOTAL: 36.7% + 33.3% + 32.3% = 100% ✓</div>
+<div style="margin-top:8px;font-size:9px;color:#9ca3af">Easy run + upper body only, moderate intensity</div>
+</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-label">DAILY NON-NEGOTIABLES</div>
+<div style="margin-top:8px;font-size:10px;line-height:2">
+<div>✓ Track EVERY gram in MyFitnessPal</div>
+<div>✓ Weigh food (scale, not eyeball)</div>
+<div>✓ Weigh yourself every morning (fasted)</div>
+<div>✓ Log weekly average (ignore daily ±2 lb swings)</div>
+<div>✓ Sleep 8–9 hours MINIMUM</div>
+<div>✓ Hydrate 3.5–4L water daily</div>
+<div>✓ Foot rehab 10–15 min EVERY day (non-negotiable)</div>
+</div>
+</div>
+
+<div style="background:rgba(220,38,38,0.08);border:2px solid #dc2626;border-radius:6px;padding:14px;margin-bottom:14px">
+<div style="font-size:10px;color:#dc2626;text-transform:uppercase;margin-bottom:12px;letter-spacing:1px;font-weight:bold">⚠️ RED FLAGS — ADJUST IF THIS HAPPENS</div>
+<div style="font-size:9px;line-height:2.2;color:#9ca3af">
+<div><strong style="color:#fff">Loss >5 lbs/week:</strong> Too aggressive. Add 100 cal/day (eat more).</div>
+<div><strong style="color:#fff">No loss after 2 weeks:</strong> Check MFP accuracy. Are you weighing food? Logging everything?</div>
+<div><strong style="color:#fff">Energy crash on runs:</strong> Increase carbs on training days by 20g, reduce fat by 10g.</div>
+<div><strong style="color:#fff">Constant hunger:</strong> Add more protein or fat. Protein is most satiating at deficit.</div>
+<div><strong style="color:#fff">Sleep suffering:</strong> Eat carbs at dinner (~20g). Low carb + training = poor sleep.</div>
+<div><strong style="color:#fff">Cravings unbearable:</strong> You're undereating other meals. Spread macros evenly across day (not front-loaded).</div>
+</div>
+</div>
+</div>
+<div class="tab-pane stats-pane" id="statsPane">
+<h2 style="font-size:14px;color:#d4af37;margin:20px 0 16px 0">WEIGHT TRACKING (WEEKS 2–8)</h2>
+
+<div class="stat-box">
+<div class="stat-label">START DATE (TODAY)</div>
+<div class="stat-value">202 lbs</div>
+<div class="stat-detail">Monday, May 26, 2026</div>
+</div>
+
+<div class="stat-box" style="background:rgba(212,175,55,0.08);border-color:#d4af37">
+<div class="stat-label">TARGET: JUL 2 (6 WEEKS)</div>
+<div class="stat-value">180 lbs</div>
+<div class="stat-detail">−22 lbs loss (3.67 lbs/week)</div>
+</div>
+
+<div class="stat-box" style="background:rgba(16,185,129,0.08);border-color:#10b981">
+<div class="stat-label">RACE GOAL: SEPT 18 (16 WEEKS)</div>
+<div class="stat-value">155 lbs</div>
+<div class="stat-detail">−47 lbs total (2.94 lbs/week)</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-label">LOG THIS WEEK'S AVERAGE</div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<input type="number" placeholder="lbs" id="weightInput" style="flex:1;padding:10px;background:transparent;border:1px solid #374151;color:#fff;border-radius:4px;font-family:'Courier New';font-size:12px">
+<button style="padding:10px 16px;background:#d4af37;border:none;color:#000;border-radius:4px;cursor:pointer;font-weight:bold;font-family:'Courier New';font-size:10px" onclick="logWeight()">SAVE</button>
+</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-label">ON TRACK TO JULY 2?</div>
+<div class="stat-value" id="onTrack">—</div>
+<div class="stat-detail" id="trackDetail">Log weight to compare</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-label">WEEKLY LOSS</div>
+<div class="stat-value" id="weeklyLoss">—</div>
+<div class="stat-detail" id="weeklyDetail">Log 2+ weeks to calculate</div>
+</div>
+
+<div class="stat-box">
+<div class="stat-label">EXPECTED MILESTONES</div>
+<div style="margin-top:8px;font-size:9px;line-height:2;color:#9ca3af">
+<div>📍 Week 2 (Jun 1): ~198 lbs</div>
+<div>📍 Week 3 (Jun 8): ~195 lbs</div>
+<div>📍 Week 4 (Jun 15): ~192 lbs (deload, slower loss)</div>
+<div>📍 Week 5 (Jun 22): ~188 lbs</div>
+<div>📍 Week 6 (Jun 29): ~185 lbs</div>
+<div style="color:#06b6d4;margin-top:8px;font-weight:bold">🎯 July 2 (Canada): ~180 lbs ✓</div>
+<div style="color:#f97316;margin-top:4px;font-size:8px">*If missing pace, adjust intake or check tracking</div>
+</div>
+</div>
+
+<h3 style="font-size:11px;color:#9ca3af;margin:20px 0 12px 0;text-transform:uppercase;letter-spacing:1px;font-weight:bold">WEEKLY LOGS (CLICK EDIT TO ADJUST)</h3>
+<div id="weightHistory"></div>
+</div>
+</div>
+
+<div class="tabs">
+<button class="tab-btn active" id="workTab">WORKOUT</button>
+<button class="tab-btn" id="nutTab">NUTRITION</button>
+<button class="tab-btn" id="statsTab">STATS</button>
+</div>
+
+<script>
+var data = {
+1: {
+mon: {t:'STATIONS + LOWER',d:'~85 min • Sled side',ex:[
+{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},
+{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},
+{nm:'A: Sled Push',nt:'4 × 12m @ 152kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},
+{nm:'B: Ski Erg',nt:'4 × 500m',rp:'4×500m',type:'d',sets:4,last:{d:500},hyrox:true},
+{nm:'C: Lunges',nt:'4 × 12 each',rp:'4×12',type:'d',sets:4,last:{d:12},hyrox:true},
+{nm:'D1: Goblet Squat',nt:'3 × 10 @ 30lb',rp:'3×10',type:'w',sets:3,last:{w:30}},
+{nm:'D2: Glute Bridges',nt:'3 × 15 @ 60lb',rp:'3×15',type:'w',sets:3,last:{w:60}},
+{nm:'E1: DB RDL',nt:'2 × 10 @ 25lb',rp:'2×10',type:'w',sets:2,last:{w:25}},
+{nm:'E2: Walking Lunges',nt:'2 × 10 each @ 45lb',rp:'2×10',type:'w',sets:2,last:{w:45}},
+{nm:'F1: Leg Press',nt:'3 × 12 @ 100lb',rp:'3×12',type:'w',sets:3,last:{w:100}},
+{nm:'F2: Leg Curl',nt:'3 × 12 @ 80lb',rp:'3×12',type:'w',sets:3,last:{w:80}}
+]},
+tue: {t:'RUN + UPPER',d:'~75 min • Row/treadmill',ex:[
+{nm:'Run',nt:'75s jog/2min walk × 6 (W1)',type:'cardio',icon:'🏃'},
+{nm:'A1: DB Bench',nt:'3 × 10 @ 30lb',rp:'3×10',type:'w',sets:3,last:{w:30}},
+{nm:'A2: Tricep Dips',nt:'3 × 10 @ 20lb',rp:'3×10',type:'w',sets:3,last:{w:20}},
+{nm:'B1: DB Rows',nt:'3 × 10 @ 30lb each',rp:'3×10',type:'w',sets:3,last:{w:30}},
+{nm:'B2: Bicep Curls',nt:'3 × 12 @ 15lb',rp:'3×12',type:'w',sets:3,last:{w:15}},
+{nm:'C1: DB Shoulder Press',nt:'3 × 10 @ 20lb',rp:'3×10',type:'w',sets:3,last:{w:20}},
+{nm:'C2: Lateral Raises',nt:'3 × 12 @ 12lb',rp:'3×12',type:'w',sets:3,last:{w:12}},
+{nm:'D1: Plank',nt:'3 × 35s',rp:'3×35s',type:'c',sets:3,last:{}},
+{nm:'D2: Dead Bug',nt:'3 × 10 each',rp:'3×10',type:'c',sets:3,last:{}}
+]},
+wed: {t:'RUN + STATIONS',d:'~80 min • Station block',ex:[
+{nm:'Run',nt:'75s jog/2min walk × 6 (W1)',type:'cardio',icon:'🏃'},
+{nm:'A: Farmer Carry',nt:'4 × 200m total @ 24kg',rp:'4×200m',type:'d',sets:4,last:{d:200},hyrox:true},
+{nm:'B: Wall Balls',nt:'4 × 12 @ 14lbs',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},
+{nm:'C: Burpee Broad Jumps',nt:'4 × 8',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},
+{nm:'D: Step-ups',nt:'4 × 12 each @ 50lb',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},
+{nm:'E1: Calf Raises',nt:'3 × 15 @ 80lb',rp:'3×15',type:'w',sets:3,last:{w:80}},
+{nm:'E2: Leg Press',nt:'3 × 12 @ 100lb',rp:'3×12',type:'w',sets:3,last:{w:100}},
+{nm:'E3: Leg Curl',nt:'3 × 12 @ 80lb',rp:'3×12',type:'w',sets:3,last:{w:80}}
+]},
+thu: {t:'STATIONS + UPPER',d:'~85 min • Rowing block',ex:[
+{nm:'Rowing Machine',nt:'10 min 500m splits',type:'cardio',icon:'⛵'},
+{nm:'A: Sled Pull',nt:'4 × 12m @ 70kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},
+{nm:'B: Ski Erg',nt:'4 × 500m',rp:'4×500m',type:'d',sets:4,last:{d:500},hyrox:true},
+{nm:'C: Farmer Carry',nt:'4 × 200m total @ 24kg',rp:'4×200m',type:'d',sets:4,last:{d:200},hyrox:true},
+{nm:'D1: Lat Pulldown',nt:'3 × 10 @ 150lb',rp:'3×10',type:'w',sets:3,last:{w:150}},
+{nm:'D2: Face Pulls',nt:'3 × 15 @ 40lb',rp:'3×15',type:'w',sets:3,last:{w:40}},
+{nm:'E1: DB Shoulder Press',nt:'3 × 10 @ 20lb',rp:'3×10',type:'w',sets:3,last:{w:20}},
+{nm:'E2: Lateral Raises',nt:'3 × 12 @ 12lb',rp:'3×12',type:'w',sets:3,last:{w:12}},
+{nm:'F1: Push-ups',nt:'3 × 12 BW',rp:'3×12',type:'c',sets:3,last:{}},
+{nm:'F2: Hammer Curls',nt:'3 × 12 @ 15lb',rp:'3×12',type:'w',sets:3,last:{w:15}}
+]},
+fri: {t:'EASY RUN',d:'~35 min • Recovery',ex:[
+{nm:'Run',nt:'20-25 min easy @ 3.2-3.5 mph',type:'cardio',icon:'🏃'}
+]},
+sat: {t:'RACE SIM',d:'~90 min • 4 rounds HYROX',ex:[
+{nm:'Run 400m',nt:'jog/walk mix',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'🏃',hyrox:true},
+{nm:'Sled Push 12m',nt:'@ 152kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},
+{nm:'Row 400m',nt:'RPE 5-6',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'⛵',hyrox:true},
+{nm:'Wall Balls 12',nt:'@ 14lbs',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},
+{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},
+{nm:'Farmer Carry 200m',nt:'@ 24kg',rp:'4×200m',type:'d',sets:4,last:{d:200},hyrox:true}
+]},
+sun: {t:'ZONE 2 RUN',d:'~55 min • Easy aerobic',longRun:true}
+}
+};
+data[2] = {mon:{t:'HYROX + LOWER',d:'~85 min',ex:[{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},{nm:'Sled Push',nt:'4 × 12m @ 120kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Sled Pull',nt:'4 × 12m @ 70kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Lunges',nt:'3 × 12 @ 15lbs',rp:'3×12',type:'w',sets:3,last:{w:15}},{nm:'Goblet Squat',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Glute Bridges',nt:'3 × 15 @ 90lbs',rp:'3×15',type:'w',sets:3,last:{w:90}},{nm:'DB RDL',nt:'3 × 10 @ 50lbs',rp:'3×10',type:'w',sets:3,last:{w:50}},{nm:'Walking Lunges',nt:'2 × 10 @ 22.5lbs',rp:'2×10',type:'w',sets:2,last:{w:22.5}},{nm:'Leg Press',nt:'3 × 12 @ 260lbs',rp:'3×12',type:'w',sets:3,last:{w:260}},{nm:'Leg Curl',nt:'3 × 12 @ 50lbs',rp:'3×12',type:'w',sets:3,last:{w:50}}]},tue:{t:'RUNNA + UPPER',d:'~75 min',ex:[{nm:'Runna (Week 2)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'DB Bench',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Tricep Dips',nt:'3 × 10 BW',rp:'3×10',type:'c',sets:3,last:{}},{nm:'DB Rows',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Bicep Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Plank',nt:'3 × 35s',rp:'3×35s',type:'c',sets:3,last:{}},{nm:'Dead Bug',nt:'3 × 10',rp:'3×10',type:'c',sets:3,last:{}}]},wed:{t:'RUNNA + HYROX + LOWER',d:'~80 min',ex:[{nm:'Runna (Week 2)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'Farmer Carry',nt:'3 × 100m @ 24kg',rp:'3×100m',type:'d',sets:3,last:{d:100},hyrox:true},{nm:'Wall Balls',nt:'3 × 12 @ 5kg',rp:'3×12',type:'c',sets:3,last:{},hyrox:true},{nm:'Burpee Broad Jumps',nt:'3 × 8',rp:'3×8',type:'r',sets:3,last:{r:8},hyrox:true},{nm:'Step-ups',nt:'3 × 10 @ 15lbs',rp:'3×10',type:'w',sets:3,last:{w:15}},{nm:'Leg Press',nt:'3 × 12 @ 260lbs',rp:'3×12',type:'w',sets:3,last:{w:260}},{nm:'Leg Curl',nt:'3 × 12 @ 50lbs',rp:'3×12',type:'w',sets:3,last:{w:50}}]},thu:{t:'ROW + HYROX + UPPER',d:'~80 min',ex:[{nm:'Rowing Machine',nt:'18 min steady',type:'cardio',icon:'⛵'},{nm:'Sled Pull',nt:'4 × 12m @ 70kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Farmer Carry',nt:'3 × 100m @ 24kg',rp:'3×100m',type:'d',sets:3,last:{d:100},hyrox:true},{nm:'Lat Pulldown',nt:'3 × 10 @ 90lbs',rp:'3×10',type:'w',sets:3,last:{w:90}},{nm:'Face Pulls',nt:'3 × 15 BW',rp:'3×15',type:'c',sets:3,last:{}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Push-ups',nt:'3 × 12 BW',rp:'3×12',type:'c',sets:3,last:{}},{nm:'Hammer Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}}]},fri:{t:'RUNNA EASY',d:'~35 min',ex:[{nm:'Runna Easy (Week 2)',nt:'Follow Runna app',type:'cardio',icon:'🏃'}]},sat:{t:'HYROX CIRCUIT 4R',d:'~90 min',ex:[{nm:'Treadmill 400m',nt:'jog/walk',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'🏃',hyrox:true},{nm:'Sled Push 12m',nt:'@ 120kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Row 400m',nt:'RPE 5-6',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'⛵',hyrox:true},{nm:'Wall Balls 12',nt:'@ 5kg',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},{nm:'Farmer Carry 100m',nt:'@ 24kg',rp:'4×100m',type:'d',sets:4,last:{d:100},hyrox:true}]},sun:{t:'RUNNA LONG RUN',d:'~55 min',longRun:true}};
+data[3] = {mon:{t:'HYROX + LOWER',d:'~85 min',ex:[{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},{nm:'Sled Push',nt:'4 × 13m @ 120kg',rp:'4×13m',type:'d',sets:4,last:{d:13},hyrox:true},{nm:'Sled Pull',nt:'4 × 13m @ 70kg',rp:'4×13m',type:'d',sets:4,last:{d:13},hyrox:true},{nm:'Lunges',nt:'3 × 12 @ 15lbs',rp:'3×12',type:'w',sets:3,last:{w:15}},{nm:'Goblet Squat',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Glute Bridges',nt:'3 × 15 @ 90lbs',rp:'3×15',type:'w',sets:3,last:{w:90}},{nm:'DB RDL',nt:'3 × 10 @ 50lbs',rp:'3×10',type:'w',sets:3,last:{w:50}},{nm:'Walking Lunges',nt:'2 × 10 @ 22.5lbs',rp:'2×10',type:'w',sets:2,last:{w:22.5}},{nm:'Leg Press',nt:'3 × 12 @ 270lbs',rp:'3×12',type:'w',sets:3,last:{w:270}},{nm:'Leg Curl',nt:'3 × 12 @ 55lbs',rp:'3×12',type:'w',sets:3,last:{w:55}}]},tue:{t:'RUNNA + UPPER',d:'~75 min',ex:[{nm:'Runna (Week 3)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'DB Bench',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Tricep Dips',nt:'3 × 10 BW',rp:'3×10',type:'c',sets:3,last:{}},{nm:'DB Rows',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Bicep Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Plank',nt:'3 × 35s',rp:'3×35s',type:'c',sets:3,last:{}},{nm:'Dead Bug',nt:'3 × 10',rp:'3×10',type:'c',sets:3,last:{}}]},wed:{t:'RUNNA + HYROX + LOWER',d:'~80 min',ex:[{nm:'Runna (Week 3)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'Farmer Carry',nt:'3 × 105m @ 24kg',rp:'3×105m',type:'d',sets:3,last:{d:105},hyrox:true},{nm:'Wall Balls',nt:'3 × 13 @ 5kg',rp:'3×13',type:'c',sets:3,last:{},hyrox:true},{nm:'Burpee Broad Jumps',nt:'3 × 8',rp:'3×8',type:'r',sets:3,last:{r:8},hyrox:true},{nm:'Step-ups',nt:'3 × 10 @ 15lbs',rp:'3×10',type:'w',sets:3,last:{w:15}},{nm:'Leg Press',nt:'3 × 12 @ 270lbs',rp:'3×12',type:'w',sets:3,last:{w:270}},{nm:'Leg Curl',nt:'3 × 12 @ 55lbs',rp:'3×12',type:'w',sets:3,last:{w:55}}]},thu:{t:'ROW + HYROX + UPPER',d:'~80 min',ex:[{nm:'Rowing Machine',nt:'18 min steady',type:'cardio',icon:'⛵'},{nm:'Sled Pull',nt:'4 × 13m @ 70kg',rp:'4×13m',type:'d',sets:4,last:{d:13},hyrox:true},{nm:'Farmer Carry',nt:'3 × 105m @ 24kg',rp:'3×105m',type:'d',sets:3,last:{d:105},hyrox:true},{nm:'Lat Pulldown',nt:'3 × 10 @ 95lbs',rp:'3×10',type:'w',sets:3,last:{w:95}},{nm:'Face Pulls',nt:'3 × 15 BW',rp:'3×15',type:'c',sets:3,last:{}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Push-ups',nt:'3 × 12 BW',rp:'3×12',type:'c',sets:3,last:{}},{nm:'Hammer Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}}]},fri:{t:'RUNNA EASY',d:'~35 min',ex:[{nm:'Runna Easy (Week 3)',nt:'Follow Runna app',type:'cardio',icon:'🏃'}]},sat:{t:'HYROX CIRCUIT 4R',d:'~90 min',ex:[{nm:'Treadmill 400m',nt:'jog/walk',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'🏃',hyrox:true},{nm:'Sled Push 12m',nt:'@ 120kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Row 400m',nt:'RPE 5-6',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'⛵',hyrox:true},{nm:'Wall Balls 12',nt:'@ 5kg',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},{nm:'Farmer Carry 100m',nt:'@ 24kg',rp:'4×100m',type:'d',sets:4,last:{d:100},hyrox:true}]},sun:{t:'RUNNA LONG RUN',d:'~55 min',longRun:true}};
+data[4] = {mon:{t:'HYROX + LOWER (DELOAD)',d:'~85 min • 60%',ex:[{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},{nm:'Sled Push',nt:'3 × 10m @ 120kg',rp:'3×10m',type:'d',sets:3,last:{d:10},hyrox:true},{nm:'Sled Pull',nt:'3 × 10m @ 70kg',rp:'3×10m',type:'d',sets:3,last:{d:10},hyrox:true},{nm:'Lunges',nt:'2 × 10 @ 15lbs',rp:'2×10',type:'w',sets:2,last:{w:15}},{nm:'Goblet Squat',nt:'2 × 8 @ 40lbs',rp:'2×8',type:'w',sets:2,last:{w:40}},{nm:'Glute Bridges',nt:'2 × 12 @ 90lbs',rp:'2×12',type:'w',sets:2,last:{w:90}},{nm:'DB RDL',nt:'2 × 8 @ 50lbs',rp:'2×8',type:'w',sets:2,last:{w:50}},{nm:'Walking Lunges',nt:'2 × 8 @ 22.5lbs',rp:'2×8',type:'w',sets:2,last:{w:22.5}},{nm:'Leg Press',nt:'3 × 12 @ 260lbs',rp:'3×12',type:'w',sets:3,last:{w:260}},{nm:'Leg Curl',nt:'3 × 12 @ 50lbs',rp:'3×12',type:'w',sets:3,last:{w:50}}]},tue:{t:'RUNNA + UPPER (DELOAD)',d:'~75 min • 60%',ex:[{nm:'Runna (Week 4)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'DB Bench',nt:'2 × 8 @ 25lbs',rp:'2×8',type:'w',sets:2,last:{w:25}},{nm:'Tricep Dips',nt:'2 × 8 BW',rp:'2×8',type:'c',sets:2,last:{}},{nm:'DB Rows',nt:'2 × 8 @ 40lbs',rp:'2×8',type:'w',sets:2,last:{w:40}},{nm:'Bicep Curls',nt:'2 × 10 @ 20lbs',rp:'2×10',type:'w',sets:2,last:{w:20}},{nm:'DB Shoulder Press',nt:'2 × 8 @ 20lbs',rp:'2×8',type:'w',sets:2,last:{w:20}},{nm:'Lateral Raises',nt:'2 × 10 @ 10lbs',rp:'2×10',type:'w',sets:2,last:{w:10}},{nm:'Plank',nt:'2 × 30s',rp:'2×30s',type:'c',sets:2,last:{}},{nm:'Dead Bug',nt:'2 × 8',rp:'2×8',type:'c',sets:2,last:{}}]},wed:{t:'RUNNA + HYROX + LOWER (DELOAD)',d:'~80 min • 60%',ex:[{nm:'Runna (Week 4)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'Farmer Carry',nt:'2 × 80m @ 24kg',rp:'2×80m',type:'d',sets:2,last:{d:80},hyrox:true},{nm:'Wall Balls',nt:'2 × 10 @ 5kg',rp:'2×10',type:'c',sets:2,last:{},hyrox:true},{nm:'Burpee Broad Jumps',nt:'2 × 6',rp:'2×6',type:'r',sets:2,last:{r:6},hyrox:true},{nm:'Step-ups',nt:'2 × 8 @ 15lbs',rp:'2×8',type:'w',sets:2,last:{w:15}},{nm:'Leg Press',nt:'3 × 12 @ 260lbs',rp:'3×12',type:'w',sets:3,last:{w:260}},{nm:'Leg Curl',nt:'3 × 12 @ 50lbs',rp:'3×12',type:'w',sets:3,last:{w:50}}]},thu:{t:'ROW + HYROX + UPPER (DELOAD)',d:'~80 min • 60%',ex:[{nm:'Rowing Machine',nt:'12 min easy',type:'cardio',icon:'⛵'},{nm:'Sled Pull',nt:'3 × 10m @ 70kg',rp:'3×10m',type:'d',sets:3,last:{d:10},hyrox:true},{nm:'Farmer Carry',nt:'2 × 80m @ 24kg',rp:'2×80m',type:'d',sets:2,last:{d:80},hyrox:true},{nm:'Lat Pulldown',nt:'3 × 10 @ 90lbs',rp:'3×10',type:'w',sets:3,last:{w:90}},{nm:'Face Pulls',nt:'2 × 12 BW',rp:'2×12',type:'c',sets:2,last:{}},{nm:'DB Shoulder Press',nt:'2 × 8 @ 20lbs',rp:'2×8',type:'w',sets:2,last:{w:20}},{nm:'Lateral Raises',nt:'2 × 10 @ 10lbs',rp:'2×10',type:'w',sets:2,last:{w:10}},{nm:'Push-ups',nt:'2 × 8 BW',rp:'2×8',type:'c',sets:2,last:{}},{nm:'Hammer Curls',nt:'2 × 10 @ 20lbs',rp:'2×10',type:'w',sets:2,last:{w:20}}]},fri:{t:'RUNNA EASY',d:'~35 min',ex:[{nm:'Runna Easy (Week 4)',nt:'Follow Runna app',type:'cardio',icon:'🏃'}]},sat:{t:'HYROX CIRCUIT 3R',d:'~90 min • DELOAD',ex:[{nm:'Treadmill 400m',nt:'jog/walk',rp:'3×400m',type:'d',sets:3,last:{d:400},icon:'🏃',hyrox:true},{nm:'Sled Push 12m',nt:'@ 120kg',rp:'3×12m',type:'d',sets:3,last:{d:12},hyrox:true},{nm:'Row 400m',nt:'RPE 5-6',rp:'3×400m',type:'d',sets:3,last:{d:400},icon:'⛵',hyrox:true},{nm:'Wall Balls 12',nt:'@ 5kg',rp:'3×12',type:'c',sets:3,last:{},hyrox:true},{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'3×8',type:'r',sets:3,last:{r:8},hyrox:true},{nm:'Farmer Carry 100m',nt:'@ 24kg',rp:'3×100m',type:'d',sets:3,last:{d:100},hyrox:true}]},sun:{t:'RUNNA LONG RUN',d:'~55 min',longRun:true}};
+data[5] = {mon:{t:'HYROX + LOWER',d:'~85 min',ex:[{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},{nm:'Sled Push',nt:'4 × 14m @ 120kg',rp:'4×14m',type:'d',sets:4,last:{d:14},hyrox:true},{nm:'Sled Pull',nt:'4 × 14m @ 70kg',rp:'4×14m',type:'d',sets:4,last:{d:14},hyrox:true},{nm:'Lunges',nt:'3 × 12 @ 15lbs',rp:'3×12',type:'w',sets:3,last:{w:15}},{nm:'Goblet Squat',nt:'3 × 10 @ 45lbs',rp:'3×10',type:'w',sets:3,last:{w:45}},{nm:'Glute Bridges',nt:'3 × 15 @ 90lbs',rp:'3×15',type:'w',sets:3,last:{w:90}},{nm:'DB RDL',nt:'3 × 10 @ 50lbs',rp:'3×10',type:'w',sets:3,last:{w:50}},{nm:'Walking Lunges',nt:'2 × 10 @ 22.5lbs',rp:'2×10',type:'w',sets:2,last:{w:22.5}},{nm:'Leg Press',nt:'3 × 12 @ 280lbs',rp:'3×12',type:'w',sets:3,last:{w:280}},{nm:'Leg Curl',nt:'3 × 12 @ 60lbs',rp:'3×12',type:'w',sets:3,last:{w:60}}]},tue:{t:'RUNNA + UPPER',d:'~75 min',ex:[{nm:'Runna (Week 5)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'DB Bench',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Tricep Dips',nt:'3 × 10 BW',rp:'3×10',type:'c',sets:3,last:{}},{nm:'DB Rows',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Bicep Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Plank',nt:'3 × 35s',rp:'3×35s',type:'c',sets:3,last:{}},{nm:'Dead Bug',nt:'3 × 10',rp:'3×10',type:'c',sets:3,last:{}}]},wed:{t:'RUNNA + HYROX + LOWER',d:'~80 min',ex:[{nm:'Runna (Week 5)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'Farmer Carry',nt:'3 × 110m @ 24kg',rp:'3×110m',type:'d',sets:3,last:{d:110},hyrox:true},{nm:'Wall Balls',nt:'3 × 12 @ 5kg',rp:'3×12',type:'c',sets:3,last:{},hyrox:true},{nm:'Burpee Broad Jumps',nt:'3 × 8',rp:'3×8',type:'r',sets:3,last:{r:8},hyrox:true},{nm:'Step-ups',nt:'3 × 10 @ 15lbs',rp:'3×10',type:'w',sets:3,last:{w:15}},{nm:'Leg Press',nt:'3 × 12 @ 280lbs',rp:'3×12',type:'w',sets:3,last:{w:280}},{nm:'Leg Curl',nt:'3 × 12 @ 60lbs',rp:'3×12',type:'w',sets:3,last:{w:60}}]},thu:{t:'ROW + HYROX + UPPER',d:'~80 min',ex:[{nm:'Rowing Machine',nt:'18 min steady',type:'cardio',icon:'⛵'},{nm:'Sled Pull',nt:'4 × 14m @ 70kg',rp:'4×14m',type:'d',sets:4,last:{d:14},hyrox:true},{nm:'Farmer Carry',nt:'3 × 110m @ 24kg',rp:'3×110m',type:'d',sets:3,last:{d:110},hyrox:true},{nm:'Lat Pulldown',nt:'3 × 10 @ 100lbs',rp:'3×10',type:'w',sets:3,last:{w:100}},{nm:'Face Pulls',nt:'3 × 15 BW',rp:'3×15',type:'c',sets:3,last:{}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Push-ups',nt:'3 × 12 BW',rp:'3×12',type:'c',sets:3,last:{}},{nm:'Hammer Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}}]},fri:{t:'RUNNA EASY',d:'~35 min',ex:[{nm:'Runna Easy (Week 5)',nt:'Follow Runna app',type:'cardio',icon:'🏃'}]},sat:{t:'HYROX CIRCUIT 4R',d:'~90 min',ex:[{nm:'Treadmill 400m',nt:'jog/walk',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'🏃',hyrox:true},{nm:'Sled Push 12m',nt:'@ 120kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Row 400m',nt:'RPE 5-6',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'⛵',hyrox:true},{nm:'Wall Balls 12',nt:'@ 5kg',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},{nm:'Farmer Carry 100m',nt:'@ 24kg',rp:'4×100m',type:'d',sets:4,last:{d:100},hyrox:true}]},sun:{t:'RUNNA LONG RUN',d:'~55 min',longRun:true}};
+data[6] = {mon:{t:'HYROX + LOWER',d:'~85 min',ex:[{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},{nm:'Sled Push',nt:'4 × 15m @ 120kg',rp:'4×15m',type:'d',sets:4,last:{d:15},hyrox:true},{nm:'Sled Pull',nt:'4 × 15m @ 75kg',rp:'4×15m',type:'d',sets:4,last:{d:15},hyrox:true},{nm:'Lunges',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'Goblet Squat',nt:'3 × 10 @ 50lbs',rp:'3×10',type:'w',sets:3,last:{w:50}},{nm:'Glute Bridges',nt:'3 × 15 @ 100lbs',rp:'3×15',type:'w',sets:3,last:{w:100}},{nm:'DB RDL',nt:'3 × 10 @ 55lbs',rp:'3×10',type:'w',sets:3,last:{w:55}},{nm:'Walking Lunges',nt:'2 × 10 @ 25lbs',rp:'2×10',type:'w',sets:2,last:{w:25}},{nm:'Leg Press',nt:'3 × 12 @ 290lbs',rp:'3×12',type:'w',sets:3,last:{w:290}},{nm:'Leg Curl',nt:'3 × 12 @ 65lbs',rp:'3×12',type:'w',sets:3,last:{w:65}}]},tue:{t:'RUNNA + UPPER',d:'~75 min',ex:[{nm:'Runna (Week 6)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'DB Bench',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Tricep Dips',nt:'3 × 10 BW',rp:'3×10',type:'c',sets:3,last:{}},{nm:'DB Rows',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Bicep Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Plank',nt:'3 × 35s',rp:'3×35s',type:'c',sets:3,last:{}},{nm:'Dead Bug',nt:'3 × 10',rp:'3×10',type:'c',sets:3,last:{}}]},wed:{t:'RUNNA + HYROX + LOWER',d:'~80 min',ex:[{nm:'Runna (Week 6)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'Farmer Carry',nt:'3 × 120m @ 24kg',rp:'3×120m',type:'d',sets:3,last:{d:120},hyrox:true},{nm:'Wall Balls',nt:'3 × 13 @ 5.5kg',rp:'3×13',type:'c',sets:3,last:{},hyrox:true},{nm:'Burpee Broad Jumps',nt:'3 × 8',rp:'3×8',type:'r',sets:3,last:{r:8},hyrox:true},{nm:'Step-ups',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Leg Press',nt:'3 × 12 @ 290lbs',rp:'3×12',type:'w',sets:3,last:{w:290}},{nm:'Leg Curl',nt:'3 × 12 @ 65lbs',rp:'3×12',type:'w',sets:3,last:{w:65}}]},thu:{t:'ROW + HYROX + UPPER',d:'~80 min',ex:[{nm:'Rowing Machine',nt:'18 min steady',type:'cardio',icon:'⛵'},{nm:'Sled Pull',nt:'4 × 15m @ 75kg',rp:'4×15m',type:'d',sets:4,last:{d:15},hyrox:true},{nm:'Farmer Carry',nt:'3 × 120m @ 24kg',rp:'3×120m',type:'d',sets:3,last:{d:120},hyrox:true},{nm:'Lat Pulldown',nt:'3 × 10 @ 105lbs',rp:'3×10',type:'w',sets:3,last:{w:105}},{nm:'Face Pulls',nt:'3 × 15 BW',rp:'3×15',type:'c',sets:3,last:{}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Lateral Raises',nt:'3 × 12 @ 12lbs',rp:'3×12',type:'w',sets:3,last:{w:12}},{nm:'Push-ups',nt:'3 × 12 BW',rp:'3×12',type:'c',sets:3,last:{}},{nm:'Hammer Curls',nt:'3 × 12 @ 25lbs',rp:'3×12',type:'w',sets:3,last:{w:25}}]},fri:{t:'RUNNA EASY',d:'~35 min',ex:[{nm:'Runna Easy (Week 6)',nt:'Follow Runna app',type:'cardio',icon:'🏃'}]},sat:{t:'HYROX CIRCUIT 4R',d:'~90 min',ex:[{nm:'Treadmill 400m',nt:'jog/walk',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'🏃',hyrox:true},{nm:'Sled Push 12m',nt:'@ 120kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Row 400m',nt:'RPE 5-6',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'⛵',hyrox:true},{nm:'Wall Balls 12',nt:'@ 5kg',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},{nm:'Farmer Carry 100m',nt:'@ 24kg',rp:'4×100m',type:'d',sets:4,last:{d:100},hyrox:true}]},sun:{t:'RUNNA LONG RUN',d:'~55 min',longRun:true}};
+data[7] = {mon:{t:'HYROX + LOWER',d:'~85 min',ex:[{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},{nm:'Sled Push',nt:'4 × 16m @ 120kg',rp:'4×16m',type:'d',sets:4,last:{d:16},hyrox:true},{nm:'Sled Pull',nt:'4 × 16m @ 75kg',rp:'4×16m',type:'d',sets:4,last:{d:16},hyrox:true},{nm:'Lunges',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'Goblet Squat',nt:'3 × 10 @ 50lbs',rp:'3×10',type:'w',sets:3,last:{w:50}},{nm:'Glute Bridges',nt:'3 × 15 @ 100lbs',rp:'3×15',type:'w',sets:3,last:{w:100}},{nm:'DB RDL',nt:'3 × 10 @ 55lbs',rp:'3×10',type:'w',sets:3,last:{w:55}},{nm:'Walking Lunges',nt:'2 × 10 @ 25lbs',rp:'2×10',type:'w',sets:2,last:{w:25}},{nm:'Leg Press',nt:'3 × 12 @ 300lbs',rp:'3×12',type:'w',sets:3,last:{w:300}},{nm:'Leg Curl',nt:'3 × 12 @ 70lbs',rp:'3×12',type:'w',sets:3,last:{w:70}}]},tue:{t:'RUNNA + UPPER',d:'~75 min',ex:[{nm:'Runna (Week 7)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'DB Bench',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Tricep Dips',nt:'3 × 10 BW',rp:'3×10',type:'c',sets:3,last:{}},{nm:'DB Rows',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Bicep Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Plank',nt:'3 × 35s',rp:'3×35s',type:'c',sets:3,last:{}},{nm:'Dead Bug',nt:'3 × 10',rp:'3×10',type:'c',sets:3,last:{}}]},wed:{t:'RUNNA + HYROX + LOWER',d:'~80 min',ex:[{nm:'Runna (Week 7)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'Farmer Carry',nt:'3 × 130m @ 24kg',rp:'3×130m',type:'d',sets:3,last:{d:130},hyrox:true},{nm:'Wall Balls',nt:'3 × 14 @ 5.5kg',rp:'3×14',type:'c',sets:3,last:{},hyrox:true},{nm:'Burpee Broad Jumps',nt:'3 × 8',rp:'3×8',type:'r',sets:3,last:{r:8},hyrox:true},{nm:'Step-ups',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Leg Press',nt:'3 × 12 @ 300lbs',rp:'3×12',type:'w',sets:3,last:{w:300}},{nm:'Leg Curl',nt:'3 × 12 @ 70lbs',rp:'3×12',type:'w',sets:3,last:{w:70}}]},thu:{t:'ROW + HYROX + UPPER',d:'~80 min',ex:[{nm:'Rowing Machine',nt:'18 min steady',type:'cardio',icon:'⛵'},{nm:'Sled Pull',nt:'4 × 16m @ 75kg',rp:'4×16m',type:'d',sets:4,last:{d:16},hyrox:true},{nm:'Farmer Carry',nt:'3 × 130m @ 24kg',rp:'3×130m',type:'d',sets:3,last:{d:130},hyrox:true},{nm:'Lat Pulldown',nt:'3 × 10 @ 110lbs',rp:'3×10',type:'w',sets:3,last:{w:110}},{nm:'Face Pulls',nt:'3 × 15 BW',rp:'3×15',type:'c',sets:3,last:{}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Lateral Raises',nt:'3 × 12 @ 12lbs',rp:'3×12',type:'w',sets:3,last:{w:12}},{nm:'Push-ups',nt:'3 × 12 BW',rp:'3×12',type:'c',sets:3,last:{}},{nm:'Hammer Curls',nt:'3 × 12 @ 25lbs',rp:'3×12',type:'w',sets:3,last:{w:25}}]},fri:{t:'RUNNA EASY',d:'~35 min',ex:[{nm:'Runna Easy (Week 7)',nt:'Follow Runna app',type:'cardio',icon:'🏃'}]},sat:{t:'HYROX CIRCUIT 4R',d:'~90 min',ex:[{nm:'Treadmill 400m',nt:'jog/walk',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'🏃',hyrox:true},{nm:'Sled Push 12m',nt:'@ 120kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Row 400m',nt:'RPE 5-6',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'⛵',hyrox:true},{nm:'Wall Balls 12',nt:'@ 5kg',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},{nm:'Farmer Carry 100m',nt:'@ 24kg',rp:'4×100m',type:'d',sets:4,last:{d:100},hyrox:true}]},sun:{t:'RUNNA LONG RUN',d:'~55 min',longRun:true}};
+data[8] = {mon:{t:'HYROX + LOWER',d:'~85 min',ex:[{nm:'Bike',nt:'5 min easy',type:'cardio',icon:'🚴'},{nm:'Stationary Bike',nt:'15 min @ 90 rpm',type:'cardio',icon:'🚴'},{nm:'Sled Push',nt:'4 × 17m @ 125kg',rp:'4×17m',type:'d',sets:4,last:{d:17},hyrox:true},{nm:'Sled Pull',nt:'4 × 17m @ 75kg',rp:'4×17m',type:'d',sets:4,last:{d:17},hyrox:true},{nm:'Lunges',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'Goblet Squat',nt:'3 × 10 @ 50lbs',rp:'3×10',type:'w',sets:3,last:{w:50}},{nm:'Glute Bridges',nt:'3 × 15 @ 100lbs',rp:'3×15',type:'w',sets:3,last:{w:100}},{nm:'DB RDL',nt:'3 × 10 @ 55lbs',rp:'3×10',type:'w',sets:3,last:{w:55}},{nm:'Walking Lunges',nt:'2 × 10 @ 25lbs',rp:'2×10',type:'w',sets:2,last:{w:25}},{nm:'Leg Press',nt:'3 × 12 @ 310lbs',rp:'3×12',type:'w',sets:3,last:{w:310}},{nm:'Leg Curl',nt:'3 × 12 @ 75lbs',rp:'3×12',type:'w',sets:3,last:{w:75}}]},tue:{t:'RUNNA + UPPER',d:'~75 min',ex:[{nm:'Runna (Week 8)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'DB Bench',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Tricep Dips',nt:'3 × 10 BW',rp:'3×10',type:'c',sets:3,last:{}},{nm:'DB Rows',nt:'3 × 10 @ 40lbs',rp:'3×10',type:'w',sets:3,last:{w:40}},{nm:'Bicep Curls',nt:'3 × 12 @ 20lbs',rp:'3×12',type:'w',sets:3,last:{w:20}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Lateral Raises',nt:'3 × 12 @ 10lbs',rp:'3×12',type:'w',sets:3,last:{w:10}},{nm:'Plank',nt:'3 × 35s',rp:'3×35s',type:'c',sets:3,last:{}},{nm:'Dead Bug',nt:'3 × 10',rp:'3×10',type:'c',sets:3,last:{}}]},wed:{t:'RUNNA + HYROX + LOWER',d:'~80 min',ex:[{nm:'Runna (Week 8)',nt:'Follow Runna app',type:'cardio',icon:'🏃'},{nm:'Farmer Carry',nt:'3 × 140m @ 24kg',rp:'3×140m',type:'d',sets:3,last:{d:140},hyrox:true},{nm:'Wall Balls',nt:'3 × 15 @ 6kg',rp:'3×15',type:'c',sets:3,last:{},hyrox:true},{nm:'Burpee Broad Jumps',nt:'3 × 8',rp:'3×8',type:'r',sets:3,last:{r:8},hyrox:true},{nm:'Step-ups',nt:'3 × 10 @ 20lbs',rp:'3×10',type:'w',sets:3,last:{w:20}},{nm:'Leg Press',nt:'3 × 12 @ 310lbs',rp:'3×12',type:'w',sets:3,last:{w:310}},{nm:'Leg Curl',nt:'3 × 12 @ 75lbs',rp:'3×12',type:'w',sets:3,last:{w:75}}]},thu:{t:'ROW + HYROX + UPPER',d:'~80 min',ex:[{nm:'Rowing Machine',nt:'18 min steady',type:'cardio',icon:'⛵'},{nm:'Sled Pull',nt:'4 × 17m @ 75kg',rp:'4×17m',type:'d',sets:4,last:{d:17},hyrox:true},{nm:'Farmer Carry',nt:'3 × 140m @ 24kg',rp:'3×140m',type:'d',sets:3,last:{d:140},hyrox:true},{nm:'Lat Pulldown',nt:'3 × 10 @ 115lbs',rp:'3×10',type:'w',sets:3,last:{w:115}},{nm:'Face Pulls',nt:'3 × 15 BW',rp:'3×15',type:'c',sets:3,last:{}},{nm:'DB Shoulder Press',nt:'3 × 10 @ 25lbs',rp:'3×10',type:'w',sets:3,last:{w:25}},{nm:'Lateral Raises',nt:'3 × 12 @ 12lbs',rp:'3×12',type:'w',sets:3,last:{w:12}},{nm:'Push-ups',nt:'3 × 12 BW',rp:'3×12',type:'c',sets:3,last:{}},{nm:'Hammer Curls',nt:'3 × 12 @ 25lbs',rp:'3×12',type:'w',sets:3,last:{w:25}}]},fri:{t:'RUNNA EASY',d:'~35 min',ex:[{nm:'Runna Easy (Week 8)',nt:'Follow Runna app',type:'cardio',icon:'🏃'}]},sat:{t:'HYROX CIRCUIT 4R',d:'~90 min',ex:[{nm:'Treadmill 400m',nt:'jog/walk',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'🏃',hyrox:true},{nm:'Sled Push 12m',nt:'@ 120kg',rp:'4×12m',type:'d',sets:4,last:{d:12},hyrox:true},{nm:'Row 400m',nt:'RPE 5-6',rp:'4×400m',type:'d',sets:4,last:{d:400},icon:'⛵',hyrox:true},{nm:'Wall Balls 12',nt:'@ 5kg',rp:'4×12',type:'c',sets:4,last:{},hyrox:true},{nm:'Burpee Broad Jumps 8',nt:'BW',rp:'4×8',type:'r',sets:4,last:{r:8},hyrox:true},{nm:'Farmer Carry 100m',nt:'@ 24kg',rp:'4×100m',type:'d',sets:4,last:{d:100},hyrox:true}]},sun:{t:'RUNNA LONG RUN',d:'~55 min',longRun:true}};
+
+localStorage.removeItem('logs');localStorage.removeItem('weights');localStorage.removeItem('longRunLog');var state = {week:1,day:'mon',logs:{},weights:[],longRunLog:{},expandedSet:null,startDate:new Date(2026,4,18)};
+var days = ['mon','tue','wed','thu','fri','sat','sun'];
+var dayLabels = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+var editingLongRun = -1;
+
+function getDayDate(d) {var idx = days.indexOf(d);var dt = new Date(state.startDate);dt.setDate(dt.getDate() + (state.week - 1) * 7 + idx);return dt;}
+function formatDate(dt) {return dt.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}).toUpperCase();}
+
+function isDateComplete(dayName) {
+  var wo = data[state.week][dayName];
+  if (!wo) return false;
+  if (wo.longRun) {
+    var key = state.week + '-sun';
+    return state.longRunLog[key] && state.longRunLog[key].time && state.longRunLog[key].pace && state.longRunLog[key].dist;
+  }
+  if (!wo.ex) return false;
+  var allDone = true;
+  for (var j = 0; j < wo.ex.length; j++) {
+    var ex = wo.ex[j];
+    if (ex.type === 'cardio') {
+      var cardioKey = state.week + '-' + dayName + '-' + ex.nm;
+      if (!state.logs[cardioKey] || !state.logs[cardioKey].done) allDone = false;
+    } else if (ex.sets) {
+      for (var s = 1; s <= ex.sets; s++) {
+        var k = state.week + '-' + dayName + '-' + ex.nm + '-' + s;
+        if (!state.logs[k] || !state.logs[k].done) allDone = false;
+      }
+    }
+    if (!allDone) break;
+  }
+  return allDone;
+}
+
+function renderDayButtons() {
+  var html = '';
+  for (var i = 0; i < days.length; i++) {
+    var cls = days[i] === state.day ? ' active' : '';
+    var isComplete = isDateComplete(days[i]);
+    if (isComplete && days[i] !== state.day) cls += ' completed';
+    html += '<button class="day-btn' + cls + '" data-day="' + days[i] + '">' + dayLabels[i] + '</button>';
+  }
+  document.getElementById('dayButtons').innerHTML = html;
+  document.querySelectorAll('.day-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      state.day = this.getAttribute('data-day');
+      renderDayButtons();
+      render();
+    });
+  });
+}
+
+function updateSetCount() {var wo = data[state.week][state.day];var total = 0, completed = 0;if (wo.ex) {for (var i = 0; i < wo.ex.length; i++) {if (wo.ex[i].sets) {total += wo.ex[i].sets;for (var s = 1; s <= wo.ex[i].sets; s++) {var k = state.week + '-' + state.day + '-' + wo.ex[i].nm + '-' + s;if (state.logs[k] && state.logs[k].done) completed++;}}}}document.getElementById('setsCount').textContent = completed + ' / ' + total;}
+
+function render() {
+  var wo = data[state.week][state.day];
+  if (!wo) return;
+  document.getElementById('workoutTitle').textContent = wo.t;
+  document.getElementById('workoutDesc').textContent = wo.d;
+  var dt = getDayDate(state.day);
+  document.getElementById('workDate').textContent = formatDate(dt);
+  updateSetCount();
+  var html = '';
+  
+  if (wo.longRun) {
+    var key = state.week + '-sun';
+    var log = state.longRunLog[key] || {};
+    var isLogged = log.time && log.pace && log.dist;
+    html += '<div class="long-run-block' + (isLogged ? ' logged' : '') + '">';
+    html += '<div class="long-run-icon">🏃</div>';
+    html += '<div class="long-run-title">ZONE 2 RUN</div>';
+    
+    if (editingLongRun === state.week) {
+      html += '<div class="long-run-desc" style="font-size:9px;color:#d4af37;margin-bottom:16px">EDIT YOUR RUN</div>';
+      html += '<div class="long-run-inputs"><div class="long-run-input"><label>TIME</label><input type="text" placeholder="mm:ss" value="' + (log.time || '') + '" id="inp-time-edit"></div>';
+      html += '<div class="long-run-input"><label>PACE</label><input type="text" placeholder="m:ss/mi" value="' + (log.pace || '') + '" id="inp-pace-edit"></div>';
+      html += '<div class="long-run-input"><label>DIST</label><input type="text" placeholder="miles" value="' + (log.dist || '') + '" id="inp-dist-edit"></div></div>';
+      html += '<button class="long-run-btn" id="btn-save-edit">✓ UPDATE RUN</button>';
+      html += '<button class="long-run-btn delete" id="btn-cancel-edit">CANCEL</button>';
+    } else if (!isLogged) {
+      html += '<div class="long-run-desc">30–40 min on treadmill or outdoors. Easy aerobic pace — conversational throughout.</div>';
+      html += '<div class="long-run-inputs"><div class="long-run-input"><label>TIME</label><input type="text" placeholder="mm:ss" value="" id="inp-time"></div>';
+      html += '<div class="long-run-input"><label>PACE</label><input type="text" placeholder="m:ss/mi" value="" id="inp-pace"></div>';
+      html += '<div class="long-run-input"><label>DIST</label><input type="text" placeholder="miles" value="" id="inp-dist"></div></div>';
+      html += '<button class="long-run-btn" id="btn-complete">✓ COMPLETE RUN</button>';
+    } else {
+      html += '<div class="long-run-summary">✓ RUN LOGGED</div>';
+      html += '<div style="font-size:10px;color:#9ca3af;margin:12px 0;line-height:1.8">';
+      html += '<div>TIME: <span style="color:#d4af37;font-weight:bold">' + log.time + '</span></div>';
+      html += '<div>PACE: <span style="color:#d4af37;font-weight:bold">' + log.pace + '</span></div>';
+      html += '<div>DISTANCE: <span style="color:#d4af37;font-weight:bold">' + log.dist + ' mi</span></div>';
+      html += '</div>';
+      html += '<button class="long-run-btn" id="btn-edit">EDIT</button>';
+      html += '<button class="long-run-btn delete" id="btn-delete">DELETE</button>';
+    }
+    
+    html += '<div class="long-run-tips"><div class="long-run-tip"><div class="long-run-tip-title">Time on feet matters most.</div>Do not push pace. RPE 3–4 only. Aerobic base is your priority right now.</div><div class="long-run-tip"><div class="long-run-tip-title">Bring water.</div>Hydration is critical. Aim for 3L+ daily.</div><div class="long-run-tip"><div class="long-run-tip-title">Protein still matters.</div>Training days include cardio. Hit your nutrition targets even on easy runs.</div><div class="long-run-tip"><div class="long-run-tip-title">Foot rehab after.</div>10–15 min: calf stretch, lacrosse ball arch roll, toe yoga.</div></div></div>';
+    html += '</div>';
+    
+    document.getElementById('workoutPane').innerHTML = html;
+    
+    if (document.getElementById('btn-complete')) {
+      document.getElementById('btn-complete').addEventListener('click', function() { logLongRun(); });
+    }
+    if (document.getElementById('btn-edit')) {
+      document.getElementById('btn-edit').addEventListener('click', function() { editingLongRun = state.week; render(); });
+    }
+    if (document.getElementById('btn-delete')) {
+      document.getElementById('btn-delete').addEventListener('click', function() { clearLongRun(); });
+    }
+    if (document.getElementById('btn-save-edit')) {
+      document.getElementById('btn-save-edit').addEventListener('click', function() { saveEditLongRun(); });
+    }
+    if (document.getElementById('btn-cancel-edit')) {
+      document.getElementById('btn-cancel-edit').addEventListener('click', function() { editingLongRun = -1; render(); });
+    }
+  } else if (!wo.ex) {
+    html += '<div class="recovery-block"><div class="recovery-icon">🌿</div><div class="recovery-title">FULL REST</div><div class="recovery-text">Recover. Eat. Sleep.</div></div>';
+    document.getElementById('workoutPane').innerHTML = html;
+  } else {
+    for (var i = 0; i < wo.ex.length; i++) {
+      var ex = wo.ex[i];
+      if (ex.type === 'cardio') {
+        var icon = ex.icon || '⏱';
+        var cardioKey = state.week + '-' + state.day + '-' + ex.nm;
+        var cardioLog = state.logs[cardioKey] || {};
+        var lastCardio = state.logs[cardioKey] ? (cardioLog.notes || 'No previous') : 'First time';
+        var escapedKey = cardioKey.replace(/'/g, "\\'");
+        var cardioButtons = state.logs[cardioKey] ? '<button class="cardio-btn" data-action="edit" data-key="' + escapedKey + '">EDIT</button><button class="cardio-btn-delete" data-action="delete" data-key="' + escapedKey + '">DELETE</button>' : '<button class="cardio-btn" data-action="log" data-key="' + escapedKey + '">LOG</button>';
+        var cardioClass = state.logs[cardioKey] ? ' cardio-done' : '';
+        html += '<div class="cardio-card' + cardioClass + '"><div class="cardio-icon">' + icon + '</div><div class="cardio-content"><div class="cardio-name">' + ex.nm + '</div><div class="cardio-desc">' + ex.nt + '</div><div class="cardio-last">Last: ' + lastCardio + '</div></div><div style="display:flex;gap:6px">' + cardioButtons + '</div></div>';
+        html += '<div class="cardio-expand" id="cardio-expand-' + escapedKey + '"><label class="cardio-input-label">Cardio Details (time, pace, distance, RPE, etc)</label><input type="text" class="cardio-input" id="cardio-input-' + escapedKey + '" placeholder="e.g., 10min @ 3.5mph, RPE 5" value="' + (cardioLog.notes || '') + '"><div class="cardio-input-hint">Previous: ' + lastCardio + '</div><div class="cardio-buttons"><button class="cardio-save-btn" data-action="save" data-key="' + escapedKey + '">✓ SAVE</button><button class="cardio-cancel-btn" data-action="cancel" data-key="' + escapedKey + '">CANCEL</button></div></div>';
+        continue;
+      }
+      var allDone = true;
+      if (ex.sets) {
+        for (var s = 1; s <= ex.sets; s++) {
+          var k = state.week + '-' + state.day + '-' + ex.nm + '-' + s;
+          if (!state.logs[k] || !state.logs[k].done) {allDone = false;break;}
+        }
+      }
+      var cardClass = allDone ? ' all-done' : '';
+      html += '<div class="exercise-card' + cardClass + '"><div class="ex-header"><div class="ex-left"><div class="ex-name">' + ex.nm + '</div><div class="ex-notes">' + ex.nt + '</div>';
+      if (ex.last && (ex.last.w || ex.last.d || ex.last.r)) {
+        html += '<div class="ex-last">Last: ';
+        if (ex.last.w) html += ex.last.w + 'lbs';
+        if (ex.last.d) html += (ex.last.w ? ' @ ' : '') + ex.last.d + 'm';
+        if (ex.last.r) html += ex.last.r + ' reps';
+        html += '</div>';
+      }
+      html += '</div><div class="ex-reps">' + ex.rp + '</div></div>';
+      html += '<div class="set-circles">';
+      for (var s = 1; s <= ex.sets; s++) {
+        var k = state.week + '-' + state.day + '-' + ex.nm + '-' + s;
+        var log = state.logs[k] || {};
+        var isDone = log.done ? ' done' : '';
+        html += '<button class="circle-btn' + isDone + '" data-key="' + k + '" data-type="' + ex.type + '" data-name="' + ex.nm + '" data-set="' + s + '" data-last="' + btoa(JSON.stringify(ex.last || {})) + '">' + s + '<span class="delete">×</span></button>';
+      }
+      html += '</div>';
+      for (var s = 1; s <= ex.sets; s++) {
+        var k = state.week + '-' + state.day + '-' + ex.nm + '-' + s;
+        html += '<div class="set-expand" id="expand-' + k + '"></div>';
+      }
+      html += '<div class="rest-bar"><span class="rest-dot"></span> REST 90S</div></div>';
+    }
+    html += '<div class="spacer"></div>';
+    document.getElementById('workoutPane').innerHTML = html;
+    
+    document.querySelectorAll('[data-action]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        var action = this.getAttribute('data-action');
+        var key = this.getAttribute('data-key');
+        if (action === 'log' || action === 'edit') {logCardio(key);} else if (action === 'delete') {deleteCardio(key);} else if (action === 'save') {saveCardio(key);} else if (action === 'cancel') {cancelCardio(key);}
+      });
+    });
+    
+    document.querySelectorAll('.circle-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete')) {
+          var btn = this;
+          var k = btn.getAttribute('data-key');
+          var nm = btn.getAttribute('data-name');
+          var num = parseInt(btn.getAttribute('data-set'));
+          delete state.logs[k];
+          if (num === 1) {
+            var wo = data[state.week][state.day];
+            if (wo && wo.ex) {
+              for (var i = 0; i < wo.ex.length; i++) {
+                if (wo.ex[i].nm === nm) {
+                  for (var s = 2; s <= wo.ex[i].sets; s++) {
+                    var nextKey = state.week + '-' + state.day + '-' + nm + '-' + s;
+                    delete state.logs[nextKey];
+                  }
+                }
+              }
+            }
+          }
+          localStorage.setItem('logs', JSON.stringify(state.logs));
+          renderDayButtons();
+          render();
+          return;
+        }
+        var k = this.getAttribute('data-key');
+        var nm = this.getAttribute('data-name');
+        var num = this.getAttribute('data-set');
+        var ty = this.getAttribute('data-type');
+        var lst = JSON.parse(atob(this.getAttribute('data-last')));
+        toggleExpand(k, nm, num, ty, lst);
+      });
+    });
+  }
+}
+
+function toggleExpand(k, nm, num, ty, lst) {var expandId = 'expand-' + k;var expandEl = document.getElementById(expandId);if (!expandEl) {console.error('Cannot find expand element: ' + expandId);return;}if (state.expandedSet === k) {expandEl.classList.remove('show');state.expandedSet = null;return;}document.querySelectorAll('.set-expand.show').forEach(function(el) {el.classList.remove('show')});state.expandedSet = k;var log = state.logs[k] || {};var set1Key = k.substring(0, k.lastIndexOf('-')) + '-1';var firstSetLog = state.logs[set1Key] || {};var html = '';if (ty === 'w') {var wVal = log.w !== undefined && log.w !== '' ? log.w : (set1Key !== k && firstSetLog.w !== undefined ? firstSetLog.w : '');html += '<label class="set-label">Weight (lbs)</label><input type="number" class="set-input" id="inp1-' + k + '" placeholder="lbs" value="' + wVal + '"><div class="set-hint">Last: ' + (lst.w || 0) + 'lbs</div>';} else if (ty === 'dw') {var dVal = log.d !== undefined && log.d !== '' ? log.d : (set1Key !== k && firstSetLog.d !== undefined ? firstSetLog.d : '');var wVal2 = log.w !== undefined && log.w !== '' ? log.w : (set1Key !== k && firstSetLog.w !== undefined ? firstSetLog.w : '');html += '<label class="set-label">Distance (m) & Weight (kg)</label><input type="number" class="set-input" id="inp1-' + k + '" placeholder="m" value="' + dVal + '"><input type="number" class="set-input" id="inp2-' + k + '" placeholder="kg" value="' + wVal2 + '"><div class="set-hint">Last: ' + (lst.d || 0) + 'm @ ' + (lst.w || 0) + 'kg</div>';} else if (ty === 'd') {var dVal = log.d !== undefined && log.d !== '' ? log.d : (set1Key !== k && firstSetLog.d !== undefined ? firstSetLog.d : '');html += '<label class="set-label">Distance (m)</label><input type="number" class="set-input" id="inp1-' + k + '" placeholder="m" value="' + dVal + '"><div class="set-hint">Last: ' + (lst.d || 0) + 'm</div>';} else if (ty === 'r') {var rVal = log.r !== undefined && log.r !== '' ? log.r : (set1Key !== k && firstSetLog.r !== undefined ? firstSetLog.r : '');html += '<label class="set-label">Reps</label><input type="number" class="set-input" id="inp1-' + k + '" placeholder="reps" value="' + rVal + '"><div class="set-hint">As programmed</div>';} else if (ty === 'x') {html += '<label class="set-label">Complete Set</label><div class="set-hint">No tracking needed</div>';}html += '<div class="set-buttons"><button class="set-btn set-btn-save" id="savebtn-' + k + '">✓ COMPLETE</button><button class="set-btn" id="cancelbtn-' + k + '">CANCEL</button></div>';expandEl.innerHTML = html;expandEl.classList.add('show');setTimeout(function() {var saveBtn = document.getElementById('savebtn-' + k);var cancelBtn = document.getElementById('cancelbtn-' + k);if (saveBtn) saveBtn.addEventListener('click', function(e) {e.preventDefault();saveLogs(k, ty, expandId, nm, set1Key);});if (cancelBtn) cancelBtn.addEventListener('click', function(e) {e.preventDefault();expandEl.classList.remove('show');state.expandedSet = null;});}, 0);}
+
+function saveLogs(k, ty, expandId, nm, set1Key) {if (!state.logs[k]) state.logs[k] = {};if (ty === 'x') {state.logs[k].done = true;} else if (ty === 'w') {var val = document.getElementById('inp1-' + k).value;state.logs[k].w = val ? parseFloat(val) : '';} else if (ty === 'dw') {var val1 = document.getElementById('inp1-' + k).value;var val2 = document.getElementById('inp2-' + k).value;state.logs[k].d = val1 ? parseFloat(val1) : '';state.logs[k].w = val2 ? parseFloat(val2) : '';} else if (ty === 'd') {var val = document.getElementById('inp1-' + k).value;state.logs[k].d = val ? parseFloat(val) : '';} else if (ty === 'r') {var val = document.getElementById('inp1-' + k).value;state.logs[k].r = val ? parseFloat(val) : '';}state.logs[k].done = true;localStorage.setItem('logs', JSON.stringify(state.logs));state.expandedSet = null;var expandEl = document.getElementById(expandId);if (expandEl) expandEl.classList.remove('show');var wo = data[state.week][state.day];if (wo.ex && ty !== 'x') {for (var i = 0; i < wo.ex.length; i++) {var ex = wo.ex[i];if (ex.nm === nm) {if (k === set1Key) {for (var s = 2; s <= ex.sets; s++) {var nextKey = state.week + '-' + state.day + '-' + nm + '-' + s;state.logs[nextKey] = JSON.parse(JSON.stringify(state.logs[k]));state.logs[nextKey].done = false;}}break;}}}localStorage.setItem('logs', JSON.stringify(state.logs));renderDayButtons();render();}
+
+function logLongRun() {
+  var time = document.getElementById('inp-time').value;
+  var pace = document.getElementById('inp-pace').value;
+  var dist = document.getElementById('inp-dist').value;
+  if (!time || !pace || !dist) {alert('Please fill in all fields');return;}
+  var key = state.week + '-sun';
+  state.longRunLog[key] = {time: time, pace: pace, dist: dist};
+  localStorage.setItem('longRunLog', JSON.stringify(state.longRunLog));
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = '✓ RUN LOGGED';
+  document.body.appendChild(toast);
+  setTimeout(function() {toast.remove();}, 2000);
+  renderDayButtons();
+  render();
+}
+
+function saveEditLongRun() {
+  var time = document.getElementById('inp-time-edit').value;
+  var pace = document.getElementById('inp-pace-edit').value;
+  var dist = document.getElementById('inp-dist-edit').value;
+  if (!time || !pace || !dist) {alert('Please fill in all fields');return;}
+  var key = state.week + '-sun';
+  state.longRunLog[key] = {time: time, pace: pace, dist: dist};
+  localStorage.setItem('longRunLog', JSON.stringify(state.longRunLog));
+  editingLongRun = -1;
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = '✓ RUN UPDATED';
+  document.body.appendChild(toast);
+  setTimeout(function() {toast.remove();}, 2000);
+  renderDayButtons();
+  render();
+}
+
+function clearLongRun() {
+  var key = state.week + '-sun';
+  delete state.longRunLog[key];
+  localStorage.setItem('longRunLog', JSON.stringify(state.longRunLog));
+  renderDayButtons();
+  render();
+}
+
+function logWeight() {var w = document.getElementById('weightInput').value;if (!w) return;var today = new Date().toISOString().split('T')[0];var entry = {date: today, weight: parseFloat(w)};state.weights.push(entry);state.weights.sort(function(a, b) {return new Date(a.date) - new Date(b.date)});localStorage.setItem('weights', JSON.stringify(state.weights));document.getElementById('weightInput').value = '';updateStats();}
+function toggleEditWeight(idx) {var el = document.getElementById('edit-' + idx);if (el.classList.contains('show')) {el.classList.remove('show');} else {document.querySelectorAll('.weight-edit-expand.show').forEach(function(e) {e.classList.remove('show')});el.classList.add('show');document.getElementById('edit-val-' + idx).focus();}}
+function saveWeightEdit(idx) {var newVal = document.getElementById('edit-val-' + idx).value;if (!newVal || isNaN(newVal)) {alert('Enter valid weight');return;}state.weights[idx].weight = parseFloat(newVal);localStorage.setItem('weights', JSON.stringify(state.weights));document.getElementById('edit-' + idx).classList.remove('show');updateStats();}
+function cancelWeightEdit(idx) {document.getElementById('edit-' + idx).classList.remove('show');}
+function deleteWeight(idx) {state.weights.splice(idx, 1);localStorage.setItem('weights', JSON.stringify(state.weights));updateStats();}
+function logCardio(key) {var expandEl = document.getElementById('cardio-expand-' + key);if (!expandEl) return;if (expandEl.classList.contains('show')) {expandEl.classList.remove('show');} else {document.querySelectorAll('.cardio-expand.show').forEach(function(e) {e.classList.remove('show')});expandEl.classList.add('show');var inputEl = document.getElementById('cardio-input-' + key);if (inputEl) inputEl.focus();}}
+function saveCardio(key) {var inputEl = document.getElementById('cardio-input-' + key);if (!inputEl) return;var notes = inputEl.value;if (!notes) {alert('Enter cardio details');return;}state.logs[key] = {notes: notes, done: true};localStorage.setItem('logs', JSON.stringify(state.logs));var expandEl = document.getElementById('cardio-expand-' + key);if (expandEl) expandEl.classList.remove('show');renderDayButtons();render();}
+function deleteCardio(key) {delete state.logs[key];localStorage.setItem('logs', JSON.stringify(state.logs));renderDayButtons();render();}
+function cancelCardio(key) {var expandEl = document.getElementById('cardio-expand-' + key);if (expandEl) expandEl.classList.remove('show');}
+
+function updateStats() {if (state.weights.length === 0) {document.getElementById('onTrack').textContent = '—';document.getElementById('trackDetail').textContent = 'Log weight to compare';document.getElementById('weeklyLoss').textContent = '—';document.getElementById('weeklyDetail').textContent = 'Log 2+ weeks to calculate';document.getElementById('weightHistory').innerHTML = '';return;}var latest = state.weights[state.weights.length - 1];var julyTarget = 180;var remaining = latest.weight - julyTarget;var weeksToJuly = 6;var targetPerWeekJuly = 22 / 6;var actualPerWeek = remaining / weeksToJuly;var paceStr = actualPerWeek <= targetPerWeekJuly ? '✓ ON PACE FOR JUL 2' : '⚠ BEHIND JUL 2 PACE';var paceColor = actualPerWeek <= targetPerWeekJuly ? '#10b981' : '#f97316';document.getElementById('onTrack').innerHTML = '<span style="color:' + paceColor + '">' + paceStr + '</span>';document.getElementById('trackDetail').textContent = (remaining > 0 ? remaining.toFixed(1) : 0) + ' lbs to 180 lbs (needed: 3.67 lbs/week)';if (state.weights.length >= 2) {var prev = state.weights[state.weights.length - 2];var weeklyLoss = prev.weight - latest.weight;document.getElementById('weeklyLoss').textContent = (weeklyLoss > 0 ? '−' : '+') + Math.abs(weeklyLoss).toFixed(1) + ' lbs';document.getElementById('weeklyDetail').textContent = 'vs last week';} else {document.getElementById('weeklyLoss').textContent = '—';document.getElementById('weeklyDetail').textContent = 'Log 2+ times to calculate';}var html = '';for (var i = state.weights.length - 1; i >= 0; i--) {var entry = state.weights[i];var prevEntry = i > 0 ? state.weights[i-1] : null;var change = prevEntry ? (prevEntry.weight - entry.weight).toFixed(1) : '—';html += '<div class="weight-entry"><div><div class="weight-date">' + entry.date + '</div><div class="weight-val">' + entry.weight + ' lbs</div>' + (prevEntry ? '<div class="weight-change">' + (change > 0 ? '−' : '+') + Math.abs(change) + ' lbs</div>' : '') + '</div><div class="weight-actions"><button class="weight-btn" onclick="toggleEditWeight(' + i + ')">EDIT</button><button class="weight-btn" onclick="deleteWeight(' + i + ')">DELETE</button></div></div>';html += '<div class="weight-edit-expand" id="edit-' + i + '"><div class="weight-edit-inputs"><input type="number" class="weight-edit-input" id="edit-val-' + i + '" placeholder="lbs" value="' + entry.weight + '"></div><div class="weight-edit-buttons"><button class="weight-edit-btn save" onclick="saveWeightEdit(' + i + ')">SAVE</button><button class="weight-edit-btn" onclick="cancelWeightEdit(' + i + ')">CANCEL</button></div></div>';}document.getElementById('weightHistory').innerHTML = html;}
+
+document.getElementById('weekSelect').addEventListener('change', function() {state.week = parseInt(this.value); renderDayButtons(); render()});
+document.getElementById('workTab').addEventListener('click', function() {document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('show')});document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});document.getElementById('workoutPane').classList.add('show');this.classList.add('active');});
+document.getElementById('nutTab').addEventListener('click', function() {document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('show')});document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});document.getElementById('nutritionPane').classList.add('show');this.classList.add('active');});
+document.getElementById('statsTab').addEventListener('click', function() {document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('show')});document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});document.getElementById('statsPane').classList.add('show');this.classList.add('active');updateStats();});
+
+renderDayButtons();
+render();
+updateStats();
+</script>
+</body>
+</html>
