@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-Canada Training Plan</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f5f4f0; font-family: Georgia, serif; }
+    input { font-size: 16px !important; }
+    input:focus { outline: 2px solid #2c5f2e; }
+    .sticky-days { position: sticky; top: 0; z-index: 10; background: #f5f4f0; padding-bottom: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const storage = {
+      get: (key) => { try { const v = localStorage.getItem(key); return v ? { value: v } : null; } catch { return null; } },
+      set: (key, value) => { try { localStorage.setItem(key, value); return true; } catch { return false; } },
+      delete: (key) => { try { localStorage.removeItem(key); return true; } catch { return false; } },
+    };
+
+    const runnaWeeks = [
+      { week: 1, startDate: "2026-05-11", sessions: {
+        6: { label: "30m R/W", km: null, type: "walkrun" },
+      }},
+      { week: 2, startDate: "2026-05-18", sessions: {
+        1: { label: "28m R/W", km: null, type: "walkrun" },
+        2: { label: "29m R/W", km: null, type: "walkrun" },
+        4: { label: "28m R/W", km: null, type: "walkrun" },
+        6: { label: "29m R/W", km: null, type: "walkrun" },
+      }},
+      { week: 3, startDate: "2026-05-25", sessions: {
+        1: { label: "28m R/W", km: null, type: "walkrun" },
+        2: { label: "30m R/W", km: null, type: "walkrun" },
+        4: { label: "31m R/W", km: null, type: "walkrun" },
+        6: { label: "30m R/W", km: null, type: "walkrun" },
+      }},
+      { week: 4, startDate: "2026-06-01", sessions: {
+        0: { label: "28m R/W", km: null, type: "walkrun" },
+        3: { label: "32m R/W", km: null, type: "walkrun" },
+        4: { label: "31m R/W", km: null, type: "walkrun" },
+        6: { label: "30m R/W", km: null, type: "walkrun" },
+      }},
+      { week: 5, startDate: "2026-06-08", sessions: {
+        0: { label: "1km Run", km: 1, type: "run" },
+        2: { label: "2km R/W", km: 2, type: "walkrun" },
+        4: { label: "2km R/W", km: 2, type: "walkrun" },
+        6: { label: "2.75km R/W", km: 2.75, type: "walkrun" },
+      }},
+      { week: 6, startDate: "2026-06-15", sessions: {
+        0: { label: "1.5km Run", km: 1.5, type: "run" },
+        2: { label: "2.5km R/W", km: 2.5, type: "walkrun" },
+        4: { label: "2.25km Run", km: 2.25, type: "run" },
+        6: { label: "3.25km R/W", km: 3.25, type: "walkrun" },
+      }},
+      { week: 7, startDate: "2026-06-22", sessions: {
+        0: { label: "3.25km Run", km: 3.25, type: "run" },
+        2: { label: "4km R/W", km: 4, type: "walkrun" },
+        4: { label: "4km R/W", km: 4, type: "walkrun" },
+        6: { label: "4km R/W", km: 4, type: "walkrun" },
+      }},
+      { week: 8, startDate: "2026-06-29", sessions: {
+        0: { label: "4km Run", km: 4, type: "run" },
+        2: { label: "4.5km R/W", km: 4.5, type: "walkrun" },
+        4: { label: "5km R/W", km: 5, type: "walkrun" },
+        6: { label: "5km R/W", km: 5, type: "walkrun" },
+      }},
+      { week: 9, startDate: "2026-07-06", sessions: {
+        0: { label: "3.5km Run", km: 3.5, type: "run" },
+        2: { label: "4.25km Run", km: 4.25, type: "run" },
+        4: { label: "5km R/W", km: 5, type: "walkrun" },
+        6: { label: "First 5K!", km: 5, type: "run", milestone: true },
+      }},
+    ];
+
+    const MILESTONES = {
+      "2026-07-02": { label: "✈️ Canada", type: "trip" },
+      "2026-07-25": { label: "🏁 SF 5K", type: "race" },
+    };
+
+    const liftDays = [
+      {
+        id: "A", label: "Lift Day A", day: "Tuesday",
+        focus: "Ankle Stability + Posterior Chain + Upper Pull",
+        cardio: { type: "Stair Master", duration: "30 min", intensity: "Moderate — medium step height. Hands off rails." },
+        warmup: "5 min easy walk + ankle circles 10 each direction + calf stretches",
+        exercises: [
+          { id: "A1", name: "Eccentric Calf Raise", sets: 3, reps: "15", notes: "Slow 3-second lower. Can progress to single leg. Priority #1 for ankle strengthening.", anchor: true, youtube: "https://www.youtube.com/results?search_query=eccentric+calf+raise+form+rehab" },
+          { id: "A2", name: "Single-Leg RDL", sets: 3, reps: "10 each", notes: "Hold light DB. Focus on balance and control, not weight. Strengthens ankle stabilizers directly.", anchor: true, youtube: "https://www.youtube.com/results?search_query=single+leg+romanian+deadlift+dumbbell+form" },
+          { id: "A3", name: "Banded Ankle Eversion", sets: 3, reps: "15 each", notes: "Resistance band around foot, push outward against band. Targets weak peroneal muscles causing ankle soreness.", anchor: true, youtube: "https://www.youtube.com/results?search_query=banded+ankle+eversion+exercise+peroneal" },
+          { id: "A4", name: "Bulgarian Split Squat", sets: 3, reps: "8 each", notes: "Rear foot elevated. Keep front foot flat — don't let arch collapse. Light weight only.", anchor: false, youtube: "https://www.youtube.com/results?search_query=bulgarian+split+squat+form+tutorial" },
+          { id: "A5", name: "Glute Bridge", sets: 3, reps: "12", notes: "Drive through heels. Pause 1 sec at top. Builds posterior chain that supports run gait.", anchor: false, youtube: "https://www.youtube.com/results?search_query=glute+bridge+form+tutorial" },
+          { id: "A6", name: "Dead Bug", sets: 3, reps: "10 each side", notes: "Core anti-rotation. Keep lower back pressed to floor the entire time.", anchor: false, youtube: "https://www.youtube.com/results?search_query=dead+bug+exercise+core+form" },
+          { id: "A7", name: "Seated Cable Row", sets: 3, reps: "12", notes: "Trains the row and ski erg pulling pattern. Squeeze shoulder blades at end. Keep chest tall.", anchor: false, youtube: "https://www.youtube.com/results?search_query=seated+cable+row+form+tutorial" },
+          { id: "A8", name: "Dumbbell Shoulder Press", sets: 3, reps: "10", notes: "Overhead stability for ski erg. Keep core tight, don't arch lower back.", anchor: false, youtube: "https://www.youtube.com/results?search_query=dumbbell+shoulder+press+form+seated" },
+        ],
+        cooldown: "Lacrosse ball rolling the arch of each foot 2 min per foot. Ankle alphabet — trace A-Z with your toe, each leg.",
+      },
+      {
+        id: "B", label: "Lift Day B", day: "Thursday",
+        focus: "Hip Stability + Single-Leg Strength + Upper Push/Pull",
+        cardio: { type: "Incline Treadmill Walk", duration: "30 min", intensity: "10-12% incline, 2.5-3.0 mph. Hands off the rails." },
+        warmup: "5 min flat walk + hip circles + single-leg balance hold 30s each side",
+        exercises: [
+          { id: "B1", name: "Step-Ups", sets: 3, reps: "10 each", notes: "Drive through the heel of the working leg. Full hip extension at top.", anchor: false, youtube: "https://www.youtube.com/results?search_query=step+up+exercise+form+dumbbell" },
+          { id: "B2", name: "Pallof Press", sets: 3, reps: "12 each side", notes: "Cable or band. Anti-rotation core. Reduces lateral sway that stresses ankles during running.", anchor: false, youtube: "https://www.youtube.com/results?search_query=pallof+press+cable+anti+rotation+core" },
+          { id: "B3", name: "Hip Thrust", sets: 3, reps: "12", notes: "Barbell or bodyweight. Drive through heels, squeeze glutes at top.", anchor: false, youtube: "https://www.youtube.com/results?search_query=hip+thrust+barbell+form+tutorial" },
+          { id: "B4", name: "Single-Leg Balance + Reach", sets: 3, reps: "10 each", notes: "Stand on one foot, reach forward with opposite hand toward floor. Builds proprioception.", anchor: true, youtube: "https://www.youtube.com/results?search_query=single+leg+balance+reach+proprioception+exercise" },
+          { id: "B5", name: "Tibialis Raise", sets: 3, reps: "15", notes: "Back against wall, heels 6in out, lift toes up repeatedly. Strengthens shin.", anchor: true, youtube: "https://www.youtube.com/results?search_query=tibialis+anterior+raise+wall+exercise" },
+          { id: "B6", name: "Side-Lying Clamshell", sets: 3, reps: "15 each", notes: "Band above knees. Opens hips, reduces knee cave, takes load off ankles.", anchor: false, youtube: "https://www.youtube.com/results?search_query=clamshell+exercise+resistance+band+hip+abductor" },
+          { id: "B7", name: "Lat Pulldown", sets: 3, reps: "12", notes: "Ski erg and row carry strength. Pull to upper chest, lean back slightly. Full stretch at top.", anchor: false, youtube: "https://www.youtube.com/results?search_query=lat+pulldown+form+tutorial+cable" },
+          { id: "B8", name: "Dumbbell Chest Press", sets: 3, reps: "10", notes: "Maintain chest and push strength. Keep feet flat, controlled descent.", anchor: false, youtube: "https://www.youtube.com/results?search_query=dumbbell+chest+press+form+tutorial" },
+        ],
+        cooldown: "Seated calf stretch 60s each foot. Ankle eversion stretch — cross foot over knee, gently rotate outward. 60s each.",
+      },
+    ];
+
+    const hyroxWeeks = [
+      { week: 1, theme: "Learn the Flow", rounds: 3, rest: "4 min between rounds",
+        note: "Focus on smooth transitions, not speed. Aerobic pace — speak in short sentences at every station.",
+        circuit: [
+          { station: "Run", side: "A", type: "run", metric: "2 min", detail: "Treadmill, Side A. Easy conversational pace." },
+          { station: "Row", side: "A", type: "machine", metric: "250m", detail: "~2:30-2:45/500m pace. Smooth strokes." },
+          { station: "Run", side: "A", type: "run", metric: "2 min", detail: "Treadmill, Side A. Same easy pace." },
+          { station: "Farmers Carry", side: "A->B", type: "carry", metric: "40m", detail: "24kg each hand. Pick up Side A, walk to Side B." },
+          { station: "Bike", side: "B", type: "bike", metric: "2 min", detail: "Side B. Moderate resistance, steady cadence." },
+          { station: "Ski Erg", side: "B", type: "machine", metric: "200m", detail: "Side B. Relaxed pull." },
+          { station: "Bike", side: "B", type: "bike", metric: "2 min", detail: "Side B. Keep legs moving into the sled." },
+          { station: "Sled Push", side: "B", type: "sled", metric: "20m", detail: "70kg. Lean forward, drive through the floor." },
+          { station: "Run", side: "A", type: "run", metric: "2 min", detail: "Back to treadmill Side A. Completes the round." },
+        ],
+      },
+      { week: 2, theme: "Build Volume", rounds: 3, rest: "3.5 min between rounds",
+        note: "Longer run and bike. Keep consistent pace — round 3 should feel like round 1.",
+        circuit: [
+          { station: "Run", side: "A", type: "run", metric: "2.5 min", detail: "Treadmill, Side A. Slight bump from Week 1." },
+          { station: "Row", side: "A", type: "machine", metric: "250m", detail: "Side A. Same as Week 1." },
+          { station: "Run", side: "A", type: "run", metric: "2.5 min", detail: "Treadmill, Side A." },
+          { station: "Farmers Carry", side: "A->B", type: "carry", metric: "40m", detail: "24kg each hand. Cross to Side B." },
+          { station: "Bike", side: "B", type: "bike", metric: "2.5 min", detail: "Side B. Slightly longer — maintain cadence." },
+          { station: "Ski Erg", side: "B", type: "machine", metric: "200m", detail: "Side B. Same distance, focus on consistency." },
+          { station: "Bike", side: "B", type: "bike", metric: "2.5 min", detail: "Side B. Keep legs turning over." },
+          { station: "Sled Push", side: "B", type: "sled", metric: "20m", detail: "70-80kg. Add 10kg if Week 1 felt easy." },
+          { station: "Run", side: "A", type: "run", metric: "2.5 min", detail: "Back to treadmill Side A." },
+        ],
+      },
+      { week: 3, theme: "Push the Aerobic Ceiling", rounds: 3, rest: "3 min between rounds",
+        note: "You will feel it in round 3. Stay aerobic — slow down before you stop.",
+        circuit: [
+          { station: "Run", side: "A", type: "run", metric: "3 min", detail: "Treadmill, Side A. Longest run yet. Stay conversational." },
+          { station: "Row", side: "A", type: "machine", metric: "300m", detail: "Side A. Small distance bump." },
+          { station: "Run", side: "A", type: "run", metric: "3 min", detail: "Treadmill, Side A. Slow down if needed." },
+          { station: "Farmers Carry", side: "A->B", type: "carry", metric: "40m", detail: "26kg each hand if available, else 24kg for 50m." },
+          { station: "Bike", side: "B", type: "bike", metric: "3 min", detail: "Side B. Keep resistance moderate." },
+          { station: "Ski Erg", side: "B", type: "machine", metric: "250m", detail: "Side B. Distance bump." },
+          { station: "Bike", side: "B", type: "bike", metric: "3 min", detail: "Side B. Hold cadence into the sled." },
+          { station: "Sled Push", side: "B", type: "sled", metric: "20m", detail: "80kg. Drive through the floor." },
+          { station: "Run", side: "A", type: "run", metric: "3 min", detail: "Hardest run of the circuit. This is where race fitness is built." },
+        ],
+      },
+      { week: 4, theme: "Deload — Canada Prep", rounds: 2, rest: "4 min between rounds",
+        note: "Pull back before Canada. 2 rounds only. Keep movements sharp.",
+        circuit: [
+          { station: "Run", side: "A", type: "run", metric: "2 min", detail: "Treadmill, Side A. Back to Week 1 time." },
+          { station: "Row", side: "A", type: "machine", metric: "250m", detail: "Side A. Focus on form." },
+          { station: "Run", side: "A", type: "run", metric: "2 min", detail: "Treadmill, Side A. Relaxed." },
+          { station: "Farmers Carry", side: "A->B", type: "carry", metric: "40m", detail: "24kg each hand. Easy pace." },
+          { station: "Bike", side: "B", type: "bike", metric: "2 min", detail: "Side B. Easy cadence." },
+          { station: "Ski Erg", side: "B", type: "machine", metric: "200m", detail: "Side B. Relaxed pull." },
+          { station: "Bike", side: "B", type: "bike", metric: "2 min", detail: "Side B. Easy." },
+          { station: "Sled Push", side: "B", type: "sled", metric: "20m", detail: "70kg. Back to base weight." },
+          { station: "Run", side: "A", type: "run", metric: "2 min", detail: "Back to treadmill Side A." },
+        ],
+      },
+    ];
+
+    function parseDate(str) { const [y,m,d] = str.split("-").map(Number); return new Date(y,m-1,d); }
+    function toDateStr(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
+    function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
+
+    function buildSessionMap() {
+      const map = {};
+      runnaWeeks.forEach(w => {
+        const monday = parseDate(w.startDate);
+        Object.entries(w.sessions).forEach(([off, session]) => {
+          const d = addDays(monday, parseInt(off));
+          const key = toDateStr(d);
+          if (!map[key]) map[key] = [];
+          map[key].push({ ...session });
+        });
+      });
+      return map;
+    }
+
+    const sessionMap = buildSessionMap();
+    const calendarWeeks = (() => {
+      const ws = [];
+      const tomorrow = addDays(new Date(), 1);
+      // Find the Monday of the week containing tomorrow
+      const tDay = tomorrow.getDay(); // 0=Sun
+      const diffToMon = tDay === 0 ? -6 : 1 - tDay;
+      let monday = addDays(tomorrow, diffToMon);
+      // Don't go before plan start
+      const planStart = parseDate("2026-05-11");
+      if (monday < planStart) monday = planStart;
+      const end = parseDate("2026-07-25");
+      while (monday <= end) { ws.push(new Date(monday)); monday = addDays(monday, 7); }
+      return ws;
+    })();
+
+    const DAY_LABELS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    const C = {
+      bg: "#f5f4f0", border: "#e2ddd0", text: "#1a1a14", muted: "#8a8070",
+      run:   { bg: "#d6eddb", text: "#1a5929", border: "#9fcfaa" },
+      walkrun: { bg: "#eaf5d6", text: "#3a5c1a", border: "#bcd98a" },
+      lift:  { bg: "#dce8f8", text: "#1a3c6a", border: "#a8c4e8" },
+      hyrox: { bg: "#f5dce8", text: "#6a1a3c", border: "#e8a8c4" },
+      milestone: { bg: "#fef8d8", text: "#7c5c00", border: "#e8d580" },
+    };
+    const stCols = {
+      run: { bg: "#e8f5e9", accent: "#2e7d32", icon: "run" },
+      bike: { bg: "#fff8e1", accent: "#f57f17", icon: "bike" },
+      machine: { bg: "#e3f2fd", accent: "#1565c0", icon: "mach" },
+      carry: { bg: "#e3f2fd", accent: "#1565c0", icon: "carry" },
+      sled: { bg: "#e3f2fd", accent: "#1565c0", icon: "sled" },
+    };
+    const stIcon = { run: "🏃", bike: "🚴", mach: "🏋️", carry: "🏋️", sled: "🛷" };
+    const sideC = { "A": { a: "#1565c0" }, "B": { a: "#880e4f" }, "A->B": { a: "#e65100" } };
+
+    function ExerciseCard({ ex, liftId }) {
+      const [open, setOpen] = useState(false);
+      const [editingIdx, setEditingIdx] = useState(null);
+      const [editVal, setEditVal] = useState("");
+      const [newWeight, setNewWeight] = useState("");
+      const [savedSets, setSavedSets] = useState([]);
+      const key = `lift-${liftId}-${ex.id}`;
+
+      useEffect(() => {
+        const r = storage.get(key);
+        if (r) { try { setSavedSets(JSON.parse(r.value).sets || []); } catch {} }
+      }, [key]);
+
+      const persist = (sets) => { setSavedSets(sets); storage.set(key, JSON.stringify({ sets })); };
+      const logSet = () => {
+        if (!newWeight.trim()) return;
+        persist([{ weight: newWeight.trim(), date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) }, ...savedSets].slice(0,15));
+        setNewWeight("");
+      };
+      const saveEdit = (i) => { if (!editVal.trim()) return; persist(savedSets.map((s,idx)=>idx===i?{...s,weight:editVal.trim()}:s)); setEditingIdx(null); };
+      const deleteSet = (i) => { persist(savedSets.filter((_,idx)=>idx!==i)); if (editingIdx===i) setEditingIdx(null); };
+
+      return (
+        <div style={{marginBottom:8}}>
+          <button onClick={()=>setOpen(!open)} style={{width:"100%",background:open?"#dce8f8":"#fff",border:ex.anchor?"1.5px solid #1565c0":`1px solid ${C.border}`,borderRadius:open?"8px 8px 0 0":8,padding:"11px 13px",cursor:"pointer",textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              {ex.anchor && <span style={{fontSize:9,background:"#1565c0",color:"#fff",borderRadius:4,padding:"2px 5px",letterSpacing:1}}>ANKLE</span>}
+              <span style={{fontSize:14,fontWeight:600,color:C.text}}>{ex.name}</span>
+              {savedSets.length>0 && <span style={{fontSize:10,background:"#e8f5e9",color:"#2e7d32",borderRadius:4,padding:"2px 6px"}}>checkmark {savedSets[0].weight}</span>}
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:12,color:C.muted}}>{ex.sets}x{ex.reps}</span>
+              <span style={{fontSize:11,color:"#bbb"}}>{open?"v":">"}</span>
+            </div>
+          </button>
+          {open && (
+            <div style={{background:"#dce8f8",borderLeft:"3px solid #1565c0",border:"1px solid #90caf9",borderTop:"none",borderRadius:"0 0 8px 8px",padding:"11px 13px"}}>
+              <p style={{margin:"0 0 10px",fontSize:13,color:"#333",lineHeight:1.6}}>{ex.notes}</p>
+              <a href={ex.youtube} target="_blank" rel="noopener noreferrer" style={{display:"inline-block",background:"#cc0000",color:"#fff",border:"none",borderRadius:6,padding:"5px 12px",fontSize:12,cursor:"pointer",marginBottom:10,textDecoration:"none",fontFamily:"Georgia,serif"}}>
+                ▶ Search on YouTube
+              </a>
+              <div style={{background:"#fff",borderRadius:8,padding:"11px",border:"1px solid #90caf9"}}>
+                <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:1,color:"#1565c0",marginBottom:8,fontWeight:700}}>Log Weight</div>
+                <div style={{display:"flex",gap:8,marginBottom:10}}>
+                  <input type="text" value={newWeight} onChange={e=>setNewWeight(e.target.value)} onKeyDown={e=>e.key==="Enter"&&logSet()} placeholder="e.g. 20kg or BW" style={{flex:1,padding:"7px 10px",border:"1px solid #90caf9",borderRadius:6,fontSize:13,fontFamily:"Georgia,serif"}} />
+                  <button onClick={logSet} style={{background:"#1565c0",color:"#fff",border:"none",borderRadius:6,padding:"7px 14px",fontSize:13,cursor:"pointer",fontWeight:600}}>Log</button>
+                </div>
+                {savedSets.length>0 && (
+                  <div>
+                    <div style={{fontSize:11,color:C.muted,marginBottom:5}}>Session log (tap pencil to edit):</div>
+                    {savedSets.map((s,i)=>(
+                      <div key={i} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 0",borderBottom:"1px solid #e3f2fd"}}>
+                        {editingIdx===i ? (
+                          <>
+                            <input autoFocus value={editVal} onChange={e=>setEditVal(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")saveEdit(i);if(e.key==="Escape")setEditingIdx(null);}} style={{flex:1,padding:"4px 8px",border:"1.5px solid #1565c0",borderRadius:5,fontSize:13,fontFamily:"Georgia,serif"}} />
+                            <button onClick={()=>saveEdit(i)} style={{background:"#1565c0",color:"#fff",border:"none",borderRadius:5,padding:"4px 9px",fontSize:12,cursor:"pointer"}}>Save</button>
+                            <button onClick={()=>setEditingIdx(null)} style={{background:"none",border:"none",fontSize:13,color:C.muted,cursor:"pointer"}}>X</button>
+                          </>
+                        ) : (
+                          <>
+                            <span style={{fontWeight:600,color:"#1565c0",fontSize:13,flex:1}}>{s.weight}</span>
+                            <span style={{fontSize:10,color:"#bbb"}}>{s.date} {s.time}</span>
+                            <button onClick={()=>{setEditingIdx(i);setEditVal(s.weight);}} style={{background:"none",border:"none",fontSize:14,cursor:"pointer",padding:"0 3px"}} title="Edit">✏️</button>
+                            <button onClick={()=>deleteSet(i)} style={{background:"none",border:"none",fontSize:14,cursor:"pointer",padding:"0 3px"}} title="Delete">🗑️</button>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function LiftView({ day }) {
+      return (
+        <div>
+          <div style={{marginBottom:14,background:"#fff",border:`1px solid ${C.border}`,borderRadius:10,overflow:"hidden"}}>
+            <div style={{background:"#1a1a14",color:"#fff",padding:"10px 13px",fontSize:13,fontWeight:600}}>{day.label} - {day.day}: {day.focus}</div>
+            <div style={{padding:"10px 13px",fontSize:12,color:"#555"}}><strong>Warm-up:</strong> {day.warmup}</div>
+          </div>
+          {day.exercises.map(ex=><ExerciseCard key={ex.id} ex={ex} liftId={day.id} />)}
+          <div style={{marginTop:8,background:"#f3e5f5",border:"1px solid #ce93d8",borderRadius:8,padding:"11px 13px",fontSize:12,color:"#4a148c",lineHeight:1.6}}>
+            <strong>Cooldown:</strong> {day.cooldown}
+          </div>
+          <div style={{marginTop:8,background:"#e8f5e9",border:"1px solid #a5d6a7",borderRadius:8,padding:"11px 13px"}}>
+            <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:1,color:"#2e7d32",marginBottom:3,fontWeight:700}}>Cardio After Lifting</div>
+            <div style={{fontSize:14,fontWeight:600,color:C.text}}>{day.cardio.type} - {day.cardio.duration}</div>
+            <div style={{fontSize:12,color:"#555",marginTop:3}}>{day.cardio.intensity}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function HyroxView() {
+      const [openWeek, setOpenWeek] = useState(0);
+      const [openStation, setOpenStation] = useState(null);
+      const circuitFlow = [
+        {icon:"🏃",label:"Run",side:"A"},{icon:"🚣",label:"Row",side:"A"},
+        {icon:"🏃",label:"Run",side:"A"},{icon:"🏋️",label:"Farmers Carry",side:"A->B"},
+        {icon:"🚴",label:"Bike",side:"B"},{icon:"⛷️",label:"Ski Erg",side:"B"},
+        {icon:"🚴",label:"Bike",side:"B"},{icon:"🛷",label:"Sled Push",side:"B"},
+        {icon:"🏃",label:"Run",side:"A"},
+      ];
+      return (
+        <div>
+          <div style={{background:"#fff",border:`1px solid ${C.border}`,borderRadius:10,padding:"13px",marginBottom:14}}>
+            <div style={{fontSize:11,textTransform:"uppercase",letterSpacing:2,color:C.muted,marginBottom:8}}>Circuit per Round</div>
+            {circuitFlow.map((s,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"3px 0"}}>
+                <span>{s.icon}</span>
+                <span style={{fontSize:13,flex:1,color:C.text}}>{s.label}</span>
+                <span style={{fontSize:10,fontWeight:700,background:s.side==="A->B"?"#fff3e0":s.side==="A"?"#e3f2fd":"#fce4ec",color:sideC[s.side].a,borderRadius:4,padding:"2px 6px"}}>{s.side}</span>
+              </div>
+            ))}
+          </div>
+          {hyroxWeeks.map((w,wi)=>(
+            <div key={wi} style={{marginBottom:10}}>
+              <button onClick={()=>setOpenWeek(openWeek===wi?null:wi)} style={{width:"100%",background:openWeek===wi?"#1a1a14":"#fff",color:openWeek===wi?"#fff":C.text,border:"1.5px solid #1a1a14",borderRadius:openWeek===wi?"10px 10px 0 0":10,padding:"11px 13px",cursor:"pointer",textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontSize:10,opacity:0.6,letterSpacing:2,textTransform:"uppercase",marginBottom:2}}>Week {w.week} - {w.rounds} rounds - {w.rest}</div>
+                  <div style={{fontSize:15,fontWeight:600}}>{w.theme}</div>
+                </div>
+                <span style={{fontSize:14,opacity:0.6}}>{openWeek===wi?"^":"v"}</span>
+              </button>
+              {openWeek===wi && (
+                <div style={{border:"1.5px solid #1a1a14",borderTop:"none",borderRadius:"0 0 10px 10px",background:"#fff",overflow:"hidden"}}>
+                  <div style={{background:"#f9f9f7",borderBottom:`1px solid ${C.border}`,padding:"9px 13px",fontSize:12,color:"#555",fontStyle:"italic"}}>{w.note}</div>
+                  {w.circuit.map((s,si)=>{
+                    const cfg = stCols[s.type];
+                    const sKey = `${wi}-${si}`;
+                    const isOpen = openStation===sKey;
+                    return (
+                      <div key={si}>
+                        <button onClick={()=>setOpenStation(isOpen?null:sKey)} style={{width:"100%",background:isOpen?cfg.bg:"#fff",border:"none",borderBottom:"1px solid #f0f0f0",padding:"10px 13px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:9}}>
+                          <span style={{fontSize:15}}>{stIcon[cfg.icon]}</span>
+                          <span style={{fontSize:14,fontWeight:600,color:C.text,flex:1}}>{s.station}</span>
+                          <span style={{fontSize:12,fontWeight:700,color:cfg.accent}}>{s.metric}</span>
+                          <span style={{fontSize:10,fontWeight:700,background:sideC[s.side].a,color:"#fff",borderRadius:4,padding:"2px 5px",marginLeft:4}}>{s.side}</span>
+                        </button>
+                        {isOpen && <div style={{background:cfg.bg,borderLeft:`3px solid ${cfg.accent}`,padding:"9px 13px 9px 17px",fontSize:13,color:"#333",lineHeight:1.6,borderBottom:"1px solid #f0f0f0"}}>{s.detail}</div>}
+                      </div>
+                    );
+                  })}
+                  <div style={{background:"#fffde7",borderTop:"1px solid #ffe082",padding:"9px 13px",fontSize:12,color:"#7c5c00"}}>
+                    <strong>{w.rounds} rounds</strong> - {w.rest}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+          <div style={{marginTop:4,padding:"11px 13px",background:"#fff",border:"1.5px solid #ffcdd2",borderRadius:10,fontSize:12,color:"#666",lineHeight:1.7}}>
+            <strong style={{color:"#c62828"}}>Aerobic rule:</strong> If you cannot speak a short sentence, slow down — don't stop.
+          </div>
+        </div>
+      );
+    }
+
+    function DayCell({ date, sessions, milestone, liftType, hyrox, isToday, isPast, onNavigate, completed, onToggleComplete }) {
+      const hasContent = sessions.length>0||milestone||liftType||hyrox;
+      const isWorkout = hyrox || liftType || sessions.length > 0;
+
+      let bg="#fff", border=`1px solid ${C.border}`;
+      if (completed) { bg="#e8e8e4"; border="1px solid #c8c8c0"; }
+      else if (milestone) { bg=C.milestone.bg; border=`1px solid ${C.milestone.border}`; }
+      else if (hyrox) { bg=C.hyrox.bg; border=`1px solid ${C.hyrox.border}`; }
+      else if (liftType) { bg=C.lift.bg; border=`1px solid ${C.lift.border}`; }
+      else if (sessions.length>0) { const t=sessions[0].type; bg=t==="run"?C.run.bg:C.walkrun.bg; border=`1px solid ${t==="run"?C.run.border:C.walkrun.border}`; }
+      if (isToday && !completed) border="2px solid #2c5f2e";
+
+      const handleTap = (e) => {
+        if (!hasContent || completed) return;
+        if (hyrox) { onNavigate("hyrox"); return; }
+        if (liftType === "A") { onNavigate("liftA"); return; }
+        if (liftType === "B") { onNavigate("liftB"); return; }
+      };
+
+      const handleCheck = (e) => {
+        e.stopPropagation();
+        if (!isWorkout) return;
+        onToggleComplete();
+      };
+
+      const textColor = completed ? "#a0a090" : undefined;
+
+      return (
+        <div onClick={handleTap} style={{background:bg,border,borderRadius:7,padding:"5px 6px",height:"100%",overflow:"hidden",cursor:hasContent&&!completed?"pointer":"default",opacity:isPast&&!hasContent?0.3:1,position:"relative"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div style={{fontSize:11,fontWeight:isToday&&!completed?700:400,color:completed?"#a0a090":isToday?"#2c5f2e":C.muted}}>{date.getDate()}</div>
+            {isWorkout && (
+              <button onClick={handleCheck} style={{background:completed?"#2c5f2e":"none",border:`1px solid ${completed?"#2c5f2e":"#c8c8c0"}`,borderRadius:"50%",width:13,height:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0,flexShrink:0}}>
+                {completed && <span style={{fontSize:8,color:"#fff",lineHeight:1}}>✓</span>}
+              </button>
+            )}
+          </div>
+          {milestone && <div style={{fontSize:8,fontWeight:700,color:completed?"#a0a090":C.milestone.text,lineHeight:1.25}}>{milestone.label}</div>}
+          {hyrox && <div style={{fontSize:8,fontWeight:700,color:completed?"#a0a090":C.hyrox.text,lineHeight:1.25}}>HYROX</div>}
+          {liftType && <div style={{fontSize:8,fontWeight:700,color:completed?"#a0a090":C.lift.text,lineHeight:1.25}}>Lift {liftType}</div>}
+          {sessions.map((s,i)=>(
+            <div key={i} style={{fontSize:8,color:completed?"#a0a090":s.type==="run"?C.run.text:C.walkrun.text,fontWeight:600,lineHeight:1.25,marginTop:1}}>
+              {s.type==="run"?"Run":"R/W"} {s.km?`${s.km}km`:s.label.substring(0,8)}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function CalendarView({ onNavigate }) {
+      const today = new Date();
+      const todayStr = toDateStr(today);
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+      const [completed, setCompleted] = useState(() => {
+        const r = storage.get("completed-days");
+        try { return r ? JSON.parse(r.value) : {}; } catch { return {}; }
+      });
+
+      const toggleComplete = (dateStr) => {
+        const next = { ...completed, [dateStr]: !completed[dateStr] };
+        if (!next[dateStr]) delete next[dateStr];
+        setCompleted(next);
+        storage.set("completed-days", JSON.stringify(next));
+      };
+
+      return (
+        <div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
+            {[
+              {bg:C.run.bg,border:C.run.border,text:C.run.text,label:"Continuous Run"},
+              {bg:C.walkrun.bg,border:C.walkrun.border,text:C.walkrun.text,label:"Walk Run"},
+              {bg:C.lift.bg,border:C.lift.border,text:C.lift.text,label:"Lift"},
+              {bg:C.hyrox.bg,border:C.hyrox.border,text:C.hyrox.text,label:"HYROX"},
+              {bg:C.milestone.bg,border:C.milestone.border,text:C.milestone.text,label:"Milestone"},
+            ].map((l,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:4}}>
+                <div style={{width:9,height:9,background:l.bg,border:`1px solid ${l.border}`,borderRadius:2}} />
+                <span style={{fontSize:10,color:l.text}}>{l.label}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize:10,color:C.muted,marginBottom:10,fontStyle:"italic"}}>Tap HYROX or Lift days to jump to that tab</div>
+          <div className="sticky-days" style={{display:"grid",gridTemplateColumns:"repeat(7, 1fr)",gap:3,marginBottom:4}}>
+            {DAY_LABELS.map(d=>(
+              <div key={d} style={{textAlign:"center",fontSize:9,fontWeight:700,color:C.muted,textTransform:"uppercase"}}>{d}</div>
+            ))}
+          </div>
+          {calendarWeeks.map((monday,wi)=>{
+            const mondayStr = toDateStr(monday);
+            const runnaW = runnaWeeks.find(w=>w.startDate===mondayStr);
+            const showMonth = wi===0 || monday.getMonth() !== addDays(monday,-7).getMonth();
+            return (
+              <div key={wi} style={{marginBottom:4}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2}}>
+                  {showMonth ? <div style={{fontSize:9,fontWeight:700,color:C.text,textTransform:"uppercase",letterSpacing:1}}>{months[monday.getMonth()]} {monday.getFullYear()}</div> : <div/>}
+                  {runnaW && <div style={{fontSize:8,color:C.muted,letterSpacing:0.5,textTransform:"uppercase"}}>Runna Wk {runnaW.week}</div>}
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(7, 1fr)",gridAutoRows:"62px",gap:3}}>
+                  {[0,1,2,3,4,5,6].map(off=>{
+                    const date = addDays(monday,off);
+                    const dateStr = toDateStr(date);
+                    const sessions = sessionMap[dateStr]||[];
+                    const milestone = MILESTONES[dateStr]||null;
+                    const liftType = off===1?"A":off===3?"B":null;
+                    const hyrox = off===5;
+                    const isPast = date < today && dateStr !== todayStr;
+                    // Skip days before tomorrow
+                    const tomorrow = addDays(today, 1);
+                    const tomorrowStr = toDateStr(tomorrow);
+                    if (dateStr < tomorrowStr && dateStr !== todayStr) {
+                      return <div key={off} style={{minHeight:52}} />;
+                    }
+                    return (
+                      <DayCell key={off} date={date} sessions={sessions} milestone={milestone} liftType={liftType} hyrox={hyrox} isToday={dateStr===todayStr} isPast={isPast} onNavigate={onNavigate} completed={!!completed[dateStr]} onToggleComplete={()=>toggleComplete(dateStr)} />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    function App() {
+      const [activeTab, setActiveTab] = useState("calendar");
+      const tabs = [
+        {id:"calendar",label:"Cal"},
+        {id:"hyrox",label:"HYROX"},
+        {id:"liftA",label:"Lift A"},
+        {id:"liftB",label:"Lift B"},
+      ];
+      return (
+        <div style={{fontFamily:"Georgia,serif",background:C.bg,minHeight:"100vh",padding:"20px 13px",maxWidth:640,margin:"0 auto"}}>
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:C.muted,marginBottom:3}}>Pre-Canada Training Block</div>
+            <h1 style={{fontSize:21,fontWeight:700,margin:0,color:C.text}}>4 Runs · 2 Lifts · 1 HYROX</h1>
+            <p style={{fontSize:11,color:C.muted,margin:"4px 0 0",fontStyle:"italic"}}>Runna "New to Running" · Jul 2 Canada · Jul 25 SF 5K</p>
+            <div style={{marginTop:10,display:"flex",gap:7}}>
+              <div style={{flex:1,background:"#dce8f8",border:`1px solid ${C.lift.border}`,borderRadius:8,padding:"8px 10px",fontSize:11,color:C.lift.text,lineHeight:1.6}}><strong>Side A</strong><br/>Treadmill · Row · Carry</div>
+              <div style={{flex:1,background:"#f5dce8",border:`1px solid ${C.hyrox.border}`,borderRadius:8,padding:"8px 10px",fontSize:11,color:C.hyrox.text,lineHeight:1.6}}><strong>Side B</strong><br/>Bike · Ski Erg · Sled Push</div>
+            </div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:5,marginBottom:16}}>
+            {tabs.map(t=>(
+              <button key={t.id} onClick={()=>setActiveTab(t.id)} style={{padding:"9px 4px",border:`1.5px solid ${C.text}`,borderRadius:8,background:activeTab===t.id?C.text:"#fff",color:activeTab===t.id?"#fff":C.text,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"Georgia,serif"}}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          {activeTab==="calendar" && <CalendarView onNavigate={setActiveTab} />}
+          {activeTab==="hyrox" && <HyroxView />}
+          {activeTab==="liftA" && <LiftView day={liftDays[0]} />}
+          {activeTab==="liftB" && <LiftView day={liftDays[1]} />}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
