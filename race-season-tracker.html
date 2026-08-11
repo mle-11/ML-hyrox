@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Race Season Tracker</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  button { margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: inherit; cursor: pointer; }
+  .font-display { font-family: 'Oswald', 'Arial Narrow', sans-serif; letter-spacing: 0.02em; }
+  .font-body { font-family: 'Inter', -apple-system, Helvetica, Arial, sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+
+  .flex { display:flex; }
+  .flex-col { flex-direction:column; }
+  .flex-wrap { flex-wrap:wrap; }
+  .flex-1 { flex:1 1 0%; }
+  .items-center { align-items:center; }
+  .items-start { align-items:flex-start; }
+  .items-baseline { align-items:baseline; }
+  .justify-between { justify-content:space-between; }
+  .justify-center { justify-content:center; }
+  .grid { display:grid; }
+  .relative { position:relative; }
+  .min-w-0 { min-width:0; }
+  .min-h-screen { min-height:100vh; }
+  .max-w-md { max-width:28rem; }
+  .mx-auto { margin-left:auto;margin-right:auto; }
+  .w-full { width:100%; }
+  .overflow-hidden { overflow:hidden; }
+  .gap-1\.5 { gap:0.375rem; }
+  .gap-2 { gap:0.5rem; }
+  .gap-x-3 { column-gap:0.75rem; }
+  .gap-y-1\.5 { row-gap:0.375rem; }
+  .px-1 { padding-left:0.25rem;padding-right:0.25rem; }
+  .px-2 { padding-left:0.5rem;padding-right:0.5rem; }
+  .px-2\.5 { padding-left:0.625rem;padding-right:0.625rem; }
+  .px-3 { padding-left:0.75rem;padding-right:0.75rem; }
+  .px-4 { padding-left:1rem;padding-right:1rem; }
+  .py-1 { padding-top:0.25rem;padding-bottom:0.25rem; }
+  .py-2 { padding-top:0.5rem;padding-bottom:0.5rem; }
+  .py-2\.5 { padding-top:0.625rem;padding-bottom:0.625rem; }
+  .py-10 { padding-top:2.5rem;padding-bottom:2.5rem; }
+  .pt-6 { padding-top:1.5rem; }
+  .pt-2\.5 { padding-top:0.625rem; }
+  .pb-16 { padding-bottom:4rem; }
+  .pb-2 { padding-bottom:0.5rem; }
+  .pb-1 { padding-bottom:0.25rem; }
+  .pl-7 { padding-left:1.75rem; }
+  .pr-2\.5 { padding-right:0.625rem; }
+  .p-4 { padding:1rem; }
+  .mb-1 { margin-bottom:0.25rem; }
+  .mb-3 { margin-bottom:0.75rem; }
+  .mb-4 { margin-bottom:1rem; }
+  .mb-5 { margin-bottom:1.25rem; }
+  .mt-1 { margin-top:0.25rem; }
+  .mt-4 { margin-top:1rem; }
+  .mt-6 { margin-top:1.5rem; }
+  .mt-0\.5 { margin-top:0.125rem; }
+  .w-2 { width:0.5rem; }
+  .h-2 { height:0.5rem; }
+  .w-24 { width:6rem; }
+  .h-1\.5 { height:0.375rem; }
+  .h-full { height:100%; }
+  .h-2px { height:2px; }
+  .rounded-full { border-radius:9999px; }
+  .rounded-lg { border-radius:0.5rem; }
+  .rounded-md { border-radius:0.375rem; }
+  .rounded-xl { border-radius:0.75rem; }
+  .text-center { text-align:center; }
+  .text-left { text-align:left; }
+  .text-right { text-align:right; }
+  .text-sm { font-size:0.875rem;line-height:1.25rem; }
+  .text-lg { font-size:1.125rem;line-height:1.75rem; }
+  .uppercase { text-transform:uppercase; }
+  .tracking-wide { letter-spacing:0.025em; }
+  .tracking-widest { letter-spacing:0.1em; }
+  .truncate { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .leading-tight { line-height:1.25; }
+  .leading-snug { line-height:1.375; }
+  .transition-colors { transition:background-color 0.15s,border-color 0.15s,color 0.15s; }
+  .fs-9 { font-size:9px; }
+  .fs-9-5 { font-size:9.5px; }
+  .fs-10 { font-size:10px; }
+  .fs-11 { font-size:11px; }
+  .fs-12 { font-size:12px; }
+  .fs-12-5 { font-size:12.5px; }
+  .fs-15 { font-size:15px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var C = {
+    bg: "#EFEFEF", surface: "#FFFFFF", surfaceAlt: "#E4E4E4", line: "#D2D2D2",
+    text: "#1C222E", textMute: "#6B7280", amber: "#E8860F", teal: "#0E9C90",
+    violet: "#6C56D9", red: "#D8412F", green: "#1F9D5C"
+  };
+
+  var EMOJI = {
+    run: "🏃", lower: "🦵", upper: "💪", full: "🏋️",
+    baseline: "🔥", hyroxSim: "🔥",
+    zwift: "🚴", plyo: "🤸",
+    off: "😴", rest: "😴", race: "🏁"
+  };
+  function typeIconSVG(type, size) {
+    return '<span style="font-size:' + size + 'px;line-height:1;flex-shrink:0;">' + (EMOJI[type] || "•") + '</span>';
+  }
+  function checkSVG(size, color) {
+    return '<span style="font-size:' + size + 'px;line-height:1;flex-shrink:0;color:' + color + ';">✓</span>';
+  }
+  function circleSVG(size, color) {
+    return '<span style="font-size:' + size + 'px;line-height:1;flex-shrink:0;color:' + color + ';">○</span>';
+  }
+  function chevronSVG(direction, size, color) {
+    var ch = direction === "down" ? "▾" : "▸";
+    return '<span style="font-size:' + size + 'px;line-height:1;flex-shrink:0;color:' + color + ';">' + ch + '</span>';
+  }
+
+  var TYPE_META = {
+    run: { label: "Run", color: C.amber },
+    lower: { label: "Lower Body", color: C.violet },
+    upper: { label: "Upper Body", color: C.violet },
+    full: { label: "Full Body", color: C.violet },
+    baseline: { label: "HYROX Baseline", color: C.red },
+    hyroxSim: { label: "HYROX Full Simulation", color: C.red },
+    zwift: { label: "Zwift", color: C.teal },
+    plyo: { label: "Plyo + Mobility", color: C.green },
+    off: { label: "Off", color: C.textMute },
+    rest: { label: "Rest Day", color: C.textMute },
+    race: { label: "RACE DAY", color: C.red }
+  };
+
+  function addDays(dateStr, n) {
+    var d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+  function shortDow(iso) {
+    var d = new Date(iso + "T00:00:00");
+    return d.toLocaleDateString("en-US", { weekday: "short" });
+  }
+  function todayISO() { return new Date().toISOString().slice(0, 10); }
+  function daysUntil(dateStr) {
+    var today = new Date(todayISO() + "T00:00:00");
+    var target = new Date(dateStr + "T00:00:00");
+    return Math.round((target - today) / 86400000);
+  }
+
+  var EX_LIB = {
+    lower: [{ title: null, items: [
+      { name: "Back Squat", sets: 4, reps: "8-10" },
+      { name: "Romanian Deadlift", sets: 4, reps: 10 },
+      { name: "Bulgarian Split Squat", sets: 4, reps: "10/leg" },
+      { name: "Leg Curl", sets: 3, reps: 12 },
+      { name: "Walking Lunge", sets: 3, reps: "12/leg" },
+      { name: "Weighted Seated Calf Raise", sets: 3, reps: 15 },
+      { name: "Tibialis Raise", sets: 3, reps: "15-20" }
+    ]}],
+    upper: [{ title: null, items: [
+      { name: "Barbell Chest Press", sets: 4, reps: 8 },
+      { name: "Lat Pulldown", sets: 4, reps: 10 },
+      { name: "Seated Cable Row", sets: 4, reps: 12 },
+      { name: "Push Press", sets: 4, reps: 8 },
+      { name: "Lateral Raise", sets: 3, reps: 15 },
+      { name: "Bicep Curl + Tricep Extension", sets: 3, reps: 12 }
+    ]}, { title: "Finisher", items: [
+      { name: "Assisted Pull-Up", sets: 3, reps: "6-8" }
+    ]}],
+    full: [{ title: null, items: [
+      { name: "Goblet Squat", sets: 3, reps: 12 },
+      { name: "DB Row", sets: 3, reps: 12 },
+      { name: "Farmer's Carry", sets: 3, reps: "40m" },
+      { name: "Glute Bridge / Hip Thrust", sets: 3, reps: 12 },
+      { name: "Overhead Press", sets: 3, reps: 10 }
+    ]}, { title: "Finisher — mini circuit, 2-3 rounds", items: [
+      { name: "KB Swings", sets: 1, reps: 15 },
+      { name: "Push-Ups", sets: 1, reps: 15 },
+      { name: "Plank", sets: 1, reps: "30s" }
+    ]}],
+    baseline: [
+      { title: "Run Block", items: [
+        { name: "1km Run (90s rest between reps)", sets: 4, reps: "1km" },
+        { name: "Wall Balls", sets: 1, reps: 40 }
+      ]},
+      { title: "Row Block", items: [
+        { name: "1km Row (90s rest between reps)", sets: 4, reps: "1km" },
+        { name: "Burpee Broad Jumps", sets: 1, reps: "80m" }
+      ]},
+      { title: "Ski Block", items: [
+        { name: "1km Ski (90s rest between reps)", sets: 4, reps: "1km" },
+        { name: "Wall Balls", sets: 1, reps: 40 }
+      ]}
+    ],
+    hyroxSim: [{ title: "Full 8-Station Simulation — solo station volume, race-pace running", items: [
+      { name: "SkiErg", sets: 1, reps: "1000m" },
+      { name: "Sled Push", sets: 1, reps: "50m" },
+      { name: "Sled Pull", sets: 1, reps: "50m" },
+      { name: "Burpee Broad Jumps", sets: 1, reps: "80m" },
+      { name: "Row", sets: 1, reps: "1000m" },
+      { name: "Farmer's Carry", sets: 1, reps: "200m" },
+      { name: "Sandbag Lunges", sets: 1, reps: "100m" },
+      { name: "Wall Balls", sets: 1, reps: 100 }
+    ]}],
+    plyo: [{ title: null, items: [
+      { name: "Box Jumps", sets: 4, reps: 8 },
+      { name: "Broad Jumps", sets: 4, reps: 6 },
+      { name: "Lateral Bounds", sets: 3, reps: "8/side" },
+      { name: "Hip Flexor Stretch", sets: 2, reps: "30s/side" },
+      { name: "Foam Roll — Quads/Calves/IT Band", sets: 1, reps: "8min" }
+    ]}]
+  };
+
+  function s(time, type, title) {
+    var base = { time: time, type: type, title: title || TYPE_META[type].label };
+    if (EX_LIB[type]) base.exerciseGroups = EX_LIB[type];
+    return base;
+  }
+  function day(dateOffset, weekStart, sessions) {
+    return { date: addDays(weekStart, dateOffset), sessions: sessions };
+  }
+
+  // ---- Phase 1: HYROX Prep (Weeks 1-8) ----
+  // Weekly template: Mon run+Lower | Tue Baseline+Zwift | Wed run+Upper |
+  // Thu run+Zwift(required) | Fri Full+Zwift(light optional) | Sat long run+optional spin | Sun Full Sim
+  function hyroxWeek(weekStart, label, mon, wed, thu, sat) {
+    return { label: label, days: [
+      day(0, weekStart, [s("AM", "run", mon), s("PM", "lower")]),
+      day(1, weekStart, [s("AM", "baseline"), s("PM", "zwift", "Zwift — Zone 2")]),
+      day(2, weekStart, [s("AM", "run", wed), s("PM", "upper")]),
+      day(3, weekStart, [s("AM", "run", thu), s("PM", "zwift", "Zwift — Zone 2 (required)")]),
+      day(4, weekStart, [s("AM", "full"), s("PM", "zwift", "Zwift — light spin (optional)")]),
+      day(5, weekStart, [s("AM", "run", sat), s("PM", "zwift", "Optional easy spin")]),
+      day(6, weekStart, [s("AM", "hyroxSim")])
+    ]};
+  }
+
+  var phase1Weeks = [
+    hyroxWeek("2026-07-27", "Week 1", "2mi Easy Run", "2mi Intervals — 1km Repeats", "2mi Repeating Progressive Run", "3.25mi Long Run"),
+    hyroxWeek("2026-08-03", "Week 2", "3.5mi Easy Run", "3.2mi Steady into Tempo", "3.5mi Easy Run", "5mi Hilly Progressive Long Run"),
+    hyroxWeek("2026-08-10", "Week 3", "3.75mi Easy Run", "3.8mi Tempo 2 Miles", "3.2mi Hill Repeats", "6mi Hilly Long Run"),
+    hyroxWeek("2026-08-17", "Week 4", "3mi Easy Run", "2.5mi Rolling 400s", "3mi Easy Run", "3.5mi Long Run"),
+    hyroxWeek("2026-08-24", "Week 5", "4mi Easy Run", "4.6mi 1km Repeats", "3mi Progression Run", "6.5mi Long Run"),
+    { label: "Week 6 — Peak", days: [
+      day(0, "2026-08-31", [s("AM", "run", "4.5mi Easy Run"), s("PM", "lower", "Lower Body (Peak Week)")]),
+      day(1, "2026-08-31", [s("AM", "baseline"), s("PM", "zwift", "Zwift — Zone 2")]),
+      day(2, "2026-08-31", [s("AM", "run", "3.8mi Tempo 2.5mi"), s("PM", "upper", "Upper Body (Peak Week)")]),
+      day(3, "2026-08-31", [s("AM", "run", "4mi Easy Run"), s("PM", "zwift", "Zwift — Zone 2 (required)")]),
+      day(4, "2026-08-31", [s("AM", "full", "Full Body (Peak Week)"), s("PM", "zwift", "Zwift — light spin (optional)")]),
+      day(5, "2026-08-31", [s("AM", "run", "7.5mi Progressive Repeat Long Run"), s("PM", "zwift", "Optional easy spin")]),
+      day(6, "2026-08-31", [s("AM", "hyroxSim", "HYROX Full Simulation — Race Pace (Dress Rehearsal)")])
+    ]},
+    { label: "Week 7 — Taper Begins", days: [
+      day(0, "2026-09-07", [s("AM", "run", "4.5mi Easy Run"), s("PM", "lower", "Lower Body (Taper ~60% Load)")]),
+      day(1, "2026-09-07", [s("AM", "baseline", "HYROX Baseline (reduced pace)")]),
+      day(2, "2026-09-07", [s("AM", "run", "4mi Over and Unders 1km"), s("PM", "upper", "Upper Body (Taper ~60% Load)")]),
+      day(3, "2026-09-07", [s("AM", "run", "3.25mi Easy Run"), s("PM", "zwift", "Zwift — Zone 2 (required)")]),
+      day(4, "2026-09-07", [s("AM", "full", "Full Body (Taper ~60% Load)")]),
+      day(5, "2026-09-07", [s("AM", "run", "6.5mi Long Run"), s("PM", "zwift", "Optional easy spin")]),
+      day(6, "2026-09-07", [s("AM", "off", "Off — mobility only")])
+    ]},
+    { label: "Week 8 — Race Week", days: [
+      day(0, "2026-09-14", [s("AM", "off", "Off — mobility only")]),
+      day(1, "2026-09-14", [s("AM", "run", "4.5mi Taper Run")]),
+      day(2, "2026-09-14", [s("AM", "rest", "Rest")]),
+      day(3, "2026-09-14", [s("AM", "off", "Off — short openers/mobility")]),
+      day(4, "2026-09-14", [s("AM", "race", "HYROX Salt Lake City — Mixed Doubles 🎉")]),
+      day(5, "2026-09-14", [s("AM", "rest", "Full recovery")]),
+      day(6, "2026-09-14", [s("AM", "rest", "Full recovery")])
+    ]}
+  ];
+
+  // ---- Phase 2: Half Marathon Build (Weeks 9-14) ----
+  // No more HYROX days. 4 strength sessions/week (2 Lower + 2 Upper), placed on
+  // rest days (heavier) and easy run days (lighter add-on). Sunday = Plyo + Mobility
+  // unless it's a race day. Hard run days (intervals/tempo/hills/long run) stay run-only.
+  var phase2Weeks = [
+    { label: "Week 9", days: [
+      day(0, "2026-09-21", [s("AM", "run", "4.5mi Easy Run"), s("PM", "lower", "Lower Body (light)")]),
+      day(1, "2026-09-21", [s("AM", "run", "4mi Pyramid Intervals")]),
+      day(2, "2026-09-21", [s("AM", "run", "4mi Easy Run"), s("PM", "upper", "Upper Body (light)")]),
+      day(3, "2026-09-21", [s("AM", "lower", "Lower Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(4, "2026-09-21", [s("AM", "upper", "Upper Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(5, "2026-09-21", [s("AM", "run", "9mi Race Practice Long Run")]),
+      day(6, "2026-09-21", [s("AM", "plyo")])
+    ]},
+    { label: "Week 10", days: [
+      day(0, "2026-09-28", [s("AM", "run", "5mi Easy Run"), s("PM", "lower", "Lower Body (light)")]),
+      day(1, "2026-09-28", [s("AM", "lower", "Lower Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(2, "2026-09-28", [s("AM", "run", "3.8mi Rolling 800s")]),
+      day(3, "2026-09-28", [s("AM", "run", "4.5mi Easy Run"), s("PM", "upper", "Upper Body (light)")]),
+      day(4, "2026-09-28", [s("AM", "upper", "Upper Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(5, "2026-09-28", [s("AM", "run", "10mi Hilly Progressive Long Run")]),
+      day(6, "2026-09-28", [s("AM", "plyo")])
+    ]},
+    { label: "Week 11", days: [
+      day(0, "2026-10-05", [s("AM", "run", "4mi Easy Run"), s("PM", "lower", "Lower Body (light)")]),
+      day(1, "2026-10-05", [s("AM", "run", "4.5mi Over and Unders Miles"), s("PM", "upper", "Upper Body (light)")]),
+      day(2, "2026-10-05", [s("AM", "lower", "Lower Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(3, "2026-10-05", [s("AM", "run", "4.4mi Alternating Hill Reps")]),
+      day(4, "2026-10-05", [s("AM", "upper", "Upper Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(5, "2026-10-05", [s("AM", "run", "12mi Hilly Long Run")]),
+      day(6, "2026-10-05", [s("AM", "plyo")])
+    ]},
+    { label: "Week 12", days: [
+      day(0, "2026-10-12", [s("AM", "run", "4mi 400m Repeats"), s("PM", "lower", "Lower Body (light)")]),
+      day(1, "2026-10-12", [s("AM", "upper", "Upper Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(2, "2026-10-12", [s("AM", "run", "4.5mi Easy Run"), s("PM", "lower", "Lower Body (light)")]),
+      day(3, "2026-10-12", [s("AM", "run", "9mi Race Practice Long Run")]),
+      day(4, "2026-10-12", [s("AM", "upper", "Upper Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(5, "2026-10-12", [s("AM", "rest", "Rest — keep legs fresh for tomorrow's 5K")]),
+      day(6, "2026-10-12", [s("AM", "race", "Diplo's Run Club — San Francisco 5K")])
+    ]},
+    { label: "Week 13", days: [
+      day(0, "2026-10-19", [s("AM", "run", "5mi Easy Run"), s("PM", "lower", "Lower Body (light)")]),
+      day(1, "2026-10-19", [s("AM", "run", "3.7mi Hill Repeats"), s("PM", "upper", "Upper Body (light)")]),
+      day(2, "2026-10-19", [s("AM", "lower", "Lower Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(3, "2026-10-19", [s("AM", "run", "3.2mi Steady into Tempo")]),
+      day(4, "2026-10-19", [s("AM", "upper", "Upper Body"), s("PM", "zwift", "Optional easy spin")]),
+      day(5, "2026-10-19", [s("AM", "run", "7mi Long Run")]),
+      day(6, "2026-10-19", [s("AM", "plyo")])
+    ]},
+    { label: "Week 14 — Race Week", days: [
+      day(0, "2026-10-26", [s("AM", "off", "Off — mobility only")]),
+      day(1, "2026-10-26", [s("AM", "run", "4mi Taper Two Miler")]),
+      day(2, "2026-10-26", [s("AM", "upper", "Upper Body — short, reduced volume openers")]),
+      day(3, "2026-10-26", [s("AM", "run", "3.5mi Easy Run")]),
+      day(4, "2026-10-26", [s("AM", "rest", "Rest")]),
+      day(5, "2026-10-26", [s("AM", "rest", "Light stretching")]),
+      day(6, "2026-10-26", [s("AM", "race", "GOLDEN GATE HALF MARATHON")])
+    ]}
+  ];
+
+  var PHASES = [
+    { key: "p1", title: "HYROX Prep", sub: "Jul 27 – Sep 18", weeks: phase1Weeks },
+    { key: "p2", title: "Half Marathon Build", sub: "Sep 21 – Nov 1", weeks: phase2Weeks }
+  ];
+  var RACES = [
+    { date: "2026-09-18", name: "HYROX — Salt Lake City", short: "HYROX" },
+    { date: "2026-10-18", name: "Diplo's Run Club 5K", short: "5K" },
+    { date: "2026-11-01", name: "Golden Gate Half Marathon", short: "HALF" }
+  ];
+
+  var STORE_DONE = "race-tracker-done";
+  function loadJSON(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function saveJSON(key, obj) {
+    try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) { /* private mode etc — fail silently */ }
+  }
+
+  function computeDefaultActivePhase() {
+    var t = todayISO();
+    var containing = -1;
+    PHASES.forEach(function (p, i) {
+      p.weeks.forEach(function (w) {
+        if (w.days.some(function (d) { return d.date === t; })) containing = i;
+      });
+    });
+    if (containing !== -1) return containing;
+    for (var i = 0; i < PHASES.length; i++) {
+      var firstDay = PHASES[i].weeks[0].days[0].date;
+      if (firstDay >= t) return i;
+    }
+    return PHASES.length - 1;
+  }
+
+  var state = {
+    activePhase: computeDefaultActivePhase(),
+    doneMap: loadJSON(STORE_DONE),
+    openWeeks: {},
+    expanded: {}
+  };
+
+  function esc(str) {
+    var d = document.createElement("div");
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+  function flattenGroups(groups) {
+    var flat = [];
+    groups.forEach(function (g) { g.items.forEach(function (it) { flat.push(it); }); });
+    return flat;
+  }
+
+  function renderSession(sess, dayDate, sessionIdx) {
+    var meta = TYPE_META[sess.type];
+    var iconHTML = typeIconSVG(sess.type, 13);
+
+    if (!sess.exerciseGroups) {
+      var key = dayDate + "__" + sessionIdx;
+      var done = !!state.doneMap[key];
+      return (
+        '<button class="w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors" ' +
+        'data-action="toggle-session" data-key="' + key + '" ' +
+        'style="background-color:' + (done ? meta.color + "22" : C.surfaceAlt) + ';border:1px solid ' + (done ? meta.color : C.line) + ';">' +
+        '<span style="flex-shrink:0;">' + (done ? checkSVG(14, meta.color) : circleSVG(13, C.textMute)) + '</span>' +
+        '<span style="flex-shrink:0;">' + iconHTML + '</span>' +
+        '<div class="min-w-0">' +
+        '<div class="font-mono fs-10 uppercase tracking-wide" style="color:' + C.textMute + ';">' + sess.time + '</div>' +
+        '<div class="font-body fs-12-5 leading-tight" style="color:' + (done ? C.textMute : C.text) + ';text-decoration:' + (done ? "line-through" : "none") + ';">' + esc(sess.title) + '</div>' +
+        '</div></button>'
+      );
+    }
+
+    var flat = flattenGroups(sess.exerciseGroups);
+    var expandKey = dayDate + "__" + sessionIdx;
+    var isExpanded = !!state.expanded[expandKey];
+    var doneCount = 0;
+    var idxCounter = -1;
+    var groupsHTML = "";
+
+    sess.exerciseGroups.forEach(function (grp) {
+      var itemsHTML = "";
+      grp.items.forEach(function (ex) {
+        idxCounter++;
+        var i = idxCounter;
+        var exKey = dayDate + "__" + sessionIdx + "__ex" + i;
+        var exDone = !!state.doneMap[exKey];
+        if (exDone) doneCount++;
+        itemsHTML +=
+          '<div class="flex items-center gap-2 py-2" style="border-bottom:1px solid ' + C.line + ';">' +
+          '<button data-action="toggle-exercise" data-key="' + exKey + '" style="flex-shrink:0;">' +
+          (exDone ? checkSVG(13, meta.color) : circleSVG(12, C.textMute)) + '</button>' +
+          '<div class="min-w-0 flex-1">' +
+          '<div class="font-body fs-11 leading-snug truncate" style="color:' + (exDone ? C.textMute : C.text) + ';text-decoration:' + (exDone ? "line-through" : "none") + ';">' + esc(ex.name) + '</div>' +
+          '<div class="font-mono fs-11" style="color:' + C.textMute + ';">' + esc(ex.sets) + ' × ' + esc(ex.reps) + '</div>' +
+          '</div></div>';
+      });
+      var titleHTML = grp.title
+        ? '<div class="font-mono fs-9-5 uppercase tracking-wide pt-2.5 pb-1" style="color:' + meta.color + ';">' + esc(grp.title) + '</div>'
+        : "";
+      groupsHTML += '<div>' + titleHTML + itemsHTML + '</div>';
+    });
+
+    var allDone = doneCount === flat.length;
+    return (
+      '<div class="rounded-md overflow-hidden" style="background-color:' + (allDone ? meta.color + "22" : C.surfaceAlt) + ';border:1px solid ' + (allDone ? meta.color : C.line) + ';">' +
+      '<button data-action="toggle-expand" data-key="' + expandKey + '" class="w-full flex items-center gap-2 px-2.5 py-2 text-left">' +
+      '<span style="flex-shrink:0;">' + (allDone ? checkSVG(14, meta.color) : circleSVG(13, C.textMute)) + '</span>' +
+      '<span style="flex-shrink:0;">' + iconHTML + '</span>' +
+      '<div class="min-w-0 flex-1">' +
+      '<div class="font-mono fs-10 uppercase tracking-wide" style="color:' + C.textMute + ';">' + sess.time + '</div>' +
+      '<div class="font-body fs-12-5 leading-tight" style="color:' + (allDone ? C.textMute : C.text) + ';">' + esc(sess.title) + '</div>' +
+      '</div>' +
+      '<span class="font-mono fs-10" style="color:' + C.textMute + ';flex-shrink:0;">' + doneCount + '/' + flat.length + '</span>' +
+      '<span style="flex-shrink:0;">' + chevronSVG(isExpanded ? "down" : "right", 14, C.textMute) + '</span>' +
+      '</button>' +
+      (isExpanded ? '<div class="pl-7 pr-2.5 pb-2 flex flex-col" style="border-top:1px solid ' + C.line + ';">' + groupsHTML + '</div>' : "") +
+      '</div>'
+    );
+  }
+
+  function renderDay(dayObj, isToday) {
+    var sessionsHTML = dayObj.sessions.map(function (sess, i) {
+      return renderSession(sess, dayObj.date, i);
+    }).join("");
+    return (
+      '<div class="grid gap-1.5 py-2 px-3" style="grid-template-columns:40px 1fr;border-bottom:1px solid ' + C.line + ';background-color:' + (isToday ? C.surfaceAlt : "transparent") + ';">' +
+      '<div class="flex flex-col items-start justify-center text-left">' +
+      '<div class="font-mono fs-10" style="color:' + (isToday ? C.amber : C.textMute) + ';">' + shortDow(dayObj.date).toUpperCase() + '</div>' +
+      '<div class="font-display text-sm" style="color:' + (isToday ? C.amber : C.text) + ';">' + new Date(dayObj.date + "T00:00:00").getDate() + '</div>' +
+      '</div>' +
+      '<div class="flex flex-col gap-1.5">' + sessionsHTML + '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderWeek(week, phaseIdx, weekIdx, isCurrentDefault) {
+    var openKey = phaseIdx + "-" + weekIdx;
+    var isOpen = state.openWeeks[openKey];
+    if (isOpen === undefined) { isOpen = isCurrentDefault; state.openWeeks[openKey] = isOpen; }
+    var today = todayISO();
+    var daysHTML = isOpen ? week.days.map(function (d) { return renderDay(d, d.date === today); }).join("") : "";
+    return (
+      '<div class="mb-3 rounded-lg overflow-hidden" style="border:1px solid ' + C.line + ';">' +
+      '<button data-action="toggle-week" data-key="' + openKey + '" class="w-full flex items-center justify-between px-3 py-2.5" style="background-color:' + C.surface + ';">' +
+      '<span class="font-display fs-15" style="color:' + C.text + ';">' + esc(week.label) + '</span>' +
+      '<span style="flex-shrink:0;">' + chevronSVG(isOpen ? "down" : "right", 16, C.textMute) + '</span>' +
+      '</button>' +
+      (isOpen ? '<div style="background-color:' + C.bg + ';">' + daysHTML + '</div>' : "") +
+      '</div>'
+    );
+  }
+
+  function renderLegend() {
+    var items = ["run", "lower", "upper", "full", "baseline", "hyroxSim", "zwift", "plyo"];
+    var html = items.map(function (k) {
+      var m = TYPE_META[k];
+      return (
+        '<div class="flex items-center gap-1.5">' +
+        '<div class="w-2 h-2 rounded-full" style="background-color:' + m.color + ';"></div>' +
+        '<span class="font-body fs-11" style="color:' + C.textMute + ';">' + esc(m.label) + '</span>' +
+        '</div>'
+      );
+    }).join("");
+    return '<div class="flex flex-wrap gap-x-3 gap-y-1.5 px-1 mb-4">' + html + '</div>';
+  }
+
+  function totalSessionsCount() {
+    var total = 0;
+    PHASES.forEach(function (p) {
+      p.weeks.forEach(function (w) {
+        w.days.forEach(function (d) {
+          d.sessions.forEach(function (sess) {
+            total += sess.exerciseGroups ? flattenGroups(sess.exerciseGroups).length : 1;
+          });
+        });
+      });
+    });
+    return total;
+  }
+
+  function render() {
+    var root = document.getElementById("root");
+    var t = todayISO();
+    var nextRace = RACES.filter(function (r) { return r.date >= t; })[0] || RACES[RACES.length - 1];
+    var nd = daysUntil(nextRace.date);
+
+    var timelineHTML = RACES.map(function (r, i) {
+      var passed = r.date < t;
+      var isNext = r.date === nextRace.date;
+      var dotSize = isNext ? 10 : 7;
+      var dotColor = passed ? C.green : (isNext ? C.amber : C.line);
+      var dot = '<div class="rounded-full" style="width:' + dotSize + 'px;height:' + dotSize + 'px;background-color:' + dotColor + ';flex-shrink:0;"></div>';
+      var connector = i < RACES.length - 1 ? '<div class="flex-1 h-2px" style="background-color:' + (passed ? C.green : C.line) + ';"></div>' : "";
+      return dot + connector;
+    }).join("");
+
+    var raceLabelsHTML = RACES.map(function (r) {
+      return '<span class="font-mono fs-9" style="color:' + C.textMute + ';">' + esc(r.short || r.name) + '</span>';
+    }).join("");
+
+    var totalSessions = totalSessionsCount();
+    var completedCount = Object.keys(state.doneMap).filter(function (k) { return state.doneMap[k]; }).length;
+    var pct = totalSessions ? Math.min(100, (completedCount / totalSessions) * 100) : 0;
+
+    var tabsHTML = PHASES.map(function (p, i) {
+      var active = state.activePhase === i;
+      return (
+        '<button data-action="set-phase" data-key="' + i + '" class="flex-1 rounded-lg px-2 py-2 text-center transition-colors" ' +
+        'style="background-color:' + (active ? C.amber : C.surface) + ';border:1px solid ' + (active ? C.amber : C.line) + ';">' +
+        '<div class="font-display fs-12 leading-tight" style="color:' + (active ? "#FFFFFF" : C.text) + ';">' + esc(p.title) + '</div>' +
+        '<div class="font-mono fs-9 mt-0.5" style="color:' + (active ? "#FFFFFFCC" : C.textMute) + ';">' + esc(p.sub) + '</div>' +
+        '</button>'
+      );
+    }).join("");
+
+    var phase = PHASES[state.activePhase];
+    var currentWeekIdx = -1;
+    phase.weeks.forEach(function (w, i) {
+      if (w.days.some(function (d) { return d.date === t; })) currentWeekIdx = i;
+    });
+    if (currentWeekIdx === -1) {
+      for (var wi = 0; wi < phase.weeks.length; wi++) {
+        if (phase.weeks[wi].days[phase.weeks[wi].days.length - 1].date >= t) { currentWeekIdx = wi; break; }
+      }
+      if (currentWeekIdx === -1) currentWeekIdx = phase.weeks.length - 1;
+    }
+    var weeksHTML = phase.weeks.map(function (w, i) { return renderWeek(w, state.activePhase, i, i === currentWeekIdx); }).join("");
+
+    root.innerHTML =
+      '<div class="min-h-screen font-body" style="background-color:' + C.bg + ';">' +
+      '<div class="max-w-md mx-auto px-4 pt-6 pb-16">' +
+
+      '<div class="rounded-xl p-4 mb-5 relative overflow-hidden" style="background-color:' + C.surface + ';border:1px solid ' + C.line + ';">' +
+      '<div class="font-mono fs-10 uppercase tracking-widest mb-1" style="color:' + C.amber + ';">Next Up</div>' +
+      '<div class="flex items-baseline gap-2">' +
+      '<span class="font-display" style="font-size:52px;line-height:1;color:' + C.amber + ';">' + (nd >= 0 ? nd : 0) + '</span>' +
+      '<span class="font-body text-sm" style="color:' + C.textMute + ';">' + (nd === 0 ? "TODAY" : "days") + '</span>' +
+      '</div>' +
+      '<div class="font-display text-lg mt-1" style="color:' + C.text + ';">' + esc(nextRace.name) + '</div>' +
+      '<div class="flex items-center gap-1.5 mt-4">' + timelineHTML + '</div>' +
+      '<div class="flex justify-between mt-1">' + raceLabelsHTML + '</div></div>' +
+
+      '<div class="flex items-center justify-between mb-4 px-1">' +
+      '<span class="font-body fs-12" style="color:' + C.textMute + ';">' + completedCount + ' / ' + totalSessions + ' sessions logged</span>' +
+      '<div class="w-24 h-1.5 rounded-full overflow-hidden" style="background-color:' + C.surfaceAlt + ';">' +
+      '<div class="h-full" style="width:' + pct + '%;background-color:' + C.amber + ';"></div></div></div>' +
+
+      '<div class="flex gap-1.5 mb-4">' + tabsHTML + '</div>' +
+
+      renderLegend() +
+
+      '<div>' + weeksHTML + '</div>' +
+
+      '<div class="text-center mt-6">' +
+      '<span class="font-mono fs-10" style="color:' + C.textMute + ';">Tap any session to check it off — your progress is saved automatically in this browser.</span>' +
+      '</div>' +
+      '</div></div>';
+  }
+
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest("[data-action]");
+    if (!el) return;
+    var action = el.getAttribute("data-action");
+    var key = el.getAttribute("data-key");
+
+    if (action === "toggle-session" || action === "toggle-exercise") {
+      state.doneMap[key] = !state.doneMap[key];
+      saveJSON(STORE_DONE, state.doneMap);
+      render();
+    } else if (action === "toggle-expand") {
+      state.expanded[key] = !state.expanded[key];
+      render();
+    } else if (action === "toggle-week") {
+      state.openWeeks[key] = !state.openWeeks[key];
+      render();
+    } else if (action === "set-phase") {
+      state.activePhase = parseInt(key, 10);
+      render();
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
